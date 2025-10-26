@@ -28,6 +28,8 @@ class User extends Authenticatable
         'profile_picture'
     ];
 
+    protected $with = ['role'];
+
     /**
      * The attributes that should be hidden for serialization.
      *

@@ -11,7 +11,13 @@ class Role extends Model
     /** @use HasFactory<\Database\Factories\RoleFactory> */
     use HasFactory;
 
-    public function users() : HasMany
+    protected $hidden = [
+        'id',
+        'created_at',
+        'updated_at',
+    ];
+
+    public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }

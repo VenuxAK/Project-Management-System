@@ -18,7 +18,7 @@ class ProjectFactory extends Factory
     {
         return [
             "name" => $this->faker->sentence(3),
-            "status" => $this->faker->randomElement(['not_started', 'in_progress', 'completed']),
+            "status" => $this->faker->randomElement(['planning', 'active', 'completed', 'on-hold']),
             "start_date" => $this->faker->date(),
             "deadline" => $this->faker->date(),
             "created_by" => 2,

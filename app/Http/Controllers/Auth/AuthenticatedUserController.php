@@ -30,7 +30,7 @@ class AuthenticatedUserController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect('/');
+        return redirect('/')->with('success', 'Welcome back! ' . Auth::user()->name);
     }
 
     public function destroy(Request $request)
@@ -41,6 +41,6 @@ class AuthenticatedUserController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/signin');
+        return redirect('/signin')->with('success', 'Logged out successfully!');
     }
 }

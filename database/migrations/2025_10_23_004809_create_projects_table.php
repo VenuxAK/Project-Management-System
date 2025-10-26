@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('status', ['not_started', 'in_progress', 'completed'])->default('not_started');
+            $table->enum('status', ['planning', 'active', 'completed', 'on-hold'])->default('planning');
             $table->date('start_date')->nullable();
             $table->date('deadline')->nullable();
             $table->foreignId('created_by')->constrained('users', 'id');

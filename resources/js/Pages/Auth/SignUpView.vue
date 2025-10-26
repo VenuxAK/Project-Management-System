@@ -8,7 +8,7 @@ import InputText from "@/components/FormElements/InputText.vue";
 import OpenEye from "@/icons/OpenEye.vue";
 import CloseEye from "@/icons/CloseEye.vue";
 import InputCheckbox from "@/components/FormElements/InputCheckbox.vue";
-import Button from "@/components/buttons/Button.vue";
+import Button from "@/components/ui/Button.vue";
 import InputError from "@/components/FormElements/InputError.vue";
 
 const showPassword = ref(false);
@@ -162,7 +162,12 @@ const handleSubmit = () => {
                                     </div>
                                     <!-- Button -->
                                     <div>
-                                        <Button type="submit">Sign Up</Button>
+                                        <Button
+                                            class="w-full"
+                                            size="sm"
+                                            type="submit"
+                                            >Sign Up</Button
+                                        >
                                     </div>
                                 </div>
                             </form>

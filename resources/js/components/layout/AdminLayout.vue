@@ -2,6 +2,7 @@
     <div class="min-h-screen xl:flex">
         <AppSidebar />
         <Backdrop />
+        <FlashMessage />
         <div
             class="flex-1 transition-all duration-300 ease-in-out"
             :class="[
@@ -21,5 +22,7 @@ import AppSidebar from "./AppSidebar.vue";
 import AppHeader from "./AppHeader.vue";
 import { useSidebar } from "@/composables/useSidebar";
 import Backdrop from "./Backdrop.vue";
+import FlashMessage from "@/components/ui/FlashMessage.vue";
+
 const { isExpanded, isHovered } = useSidebar();
 </script>
