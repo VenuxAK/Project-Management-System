@@ -5,10 +5,21 @@
             @click.prevent="toggleDropdown"
         >
             <span class="mr-3 overflow-hidden rounded-full h-11 w-11">
-                <img src="/public/images/user/profile.jpg" alt="User" />
+                <img
+                    v-if="user.profile_picture"
+                    :src="user.profile_picture"
+                    :alt="user.name"
+                />
+                <img
+                    v-else
+                    src="/public/images/user/profile.jpg"
+                    :alt="user.name"
+                />
             </span>
 
-            <span class="block mr-1 font-medium text-theme-sm">Venux </span>
+            <span class="block mr-1 font-medium text-theme-sm"
+                >{{ user.name }}
+            </span>
 
             <ChevronDownIcon :class="{ 'rotate-180': dropdownOpen }" />
         </button>
@@ -22,12 +33,12 @@
                 <span
                     class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400"
                 >
-                    Minn ArKar
+                    {{ user.name }}
                 </span>
                 <span
                     class="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400"
                 >
-                    minnarkar@gmail.com
+                    {{ user.email }}
                 </span>
             </div>
 
@@ -72,7 +83,12 @@ import {
     InfoCircleIcon,
 } from "@/icons";
 import { Link } from "@inertiajs/vue3";
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
+import { usePage, useForm } from "@inertiajs/vue3";
+
+const page = usePage();
+
+const user = computed(() => page.props.auth.user);
 
 const dropdownOpen = ref(false);
 const dropdownRef = ref(null);
@@ -92,8 +108,9 @@ const closeDropdown = () => {
 };
 
 const signOut = () => {
-    // Implement sign out logic here
-    console.log("Signing out...");
+    useForm().post("/signout", {
+        onProgress: () => console.log("Signing out..."),
+    });
     closeDropdown();
 };
 

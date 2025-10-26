@@ -11,25 +11,24 @@ use Inertia\Inertia;
 //     ];
 // });
 
-Route::get('/', function () {
-    return Inertia::render('IndexView');
-})->name('home');
+Route::middleware('auth')->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('IndexView');
+    })->name('home');
 
-Route::get('/projects', function () {
-    return Inertia::render('Project/Index');
-})->name('projects.view');
+    Route::get('/projects', function () {
+        return Inertia::render('Project/Index');
+    })->name('projects.view');
 
-Route::get('/tasks', function () {
-    return Inertia::render('Task/Index');
-})->name('tasks.view');
+    Route::get('/tasks', function () {
+        return Inertia::render('Task/Index');
+    })->name('tasks.view');
 
-Route::get('/members', function () {
-    return Inertia::render('Member/Index');
-})->name('members.view');
+    Route::get('/members', function () {
+        return Inertia::render('Member/Index');
+    })->name('members.view');
+});
 
-Route::get('/signin', function () {
-    return Inertia::render('Auth/SignInView');
-})->name('auth.signin');
-Route::get('/signup', function () {
-    return Inertia::render('Auth/SignUpView');
-})->name('auth.signup');
+
+
+require_once __DIR__ . "/auth.php";
