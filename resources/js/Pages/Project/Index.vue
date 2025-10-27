@@ -1,5 +1,5 @@
 <script setup>
-import { defineOptions, onMounted, ref } from "vue";
+import { ref } from "vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import SidebarProvider from "@/components/layout/SidebarProvider.vue";
 import ProjectTable from "@/components/projects/ProjectTable.vue";
@@ -20,10 +20,6 @@ const props = defineProps({
 });
 
 const isProjectModalOpen = ref(false);
-
-// onMounted(() => {
-//     console.log("Projects data:", props.projects);
-// });
 </script>
 
 <template>

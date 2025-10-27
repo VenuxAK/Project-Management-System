@@ -1,8 +1,6 @@
 <script setup>
 import DataTable from "@/components/ui/DataTable.vue";
-import { useProjectManager } from "@/composables/useProjectManager";
-
-const { deleteProject } = useProjectManager();
+import { computed } from "vue";
 
 const props = defineProps({
     projects: {
@@ -12,34 +10,26 @@ const props = defineProps({
 });
 
 const cols = [
-    { label: "ID", key: "id", sortable: true },
     { label: "Name", key: "name", sortable: false },
-    { label: "Status", key: "status", sortable: false },
+    { label: "Status", key: "status", sortable: true },
     { label: "Start Date", key: "start_date", sortable: true },
     { label: "Deadline", key: "deadline", sortable: true },
 ];
-
-const rows = props.projects.map((project) => ({
-    id: project.id,
-    name: project.name,
-    status: project.status,
-    start_date: project.start_date,
-    deadline: project.deadline,
-}));
-
-const onDeleteProject = (projectId) => {
-    deleteProject(projectId);
-};
+const rows = computed(() => {
+    return props.projects.map((project) => ({
+        name: project.name,
+        status: project.status,
+        start_date: project.start_date,
+        deadline: project.deadline,
+    }));
+});
 </script>
 
 <template>
-    <DataTable
-        :columns="cols"
-        :rows="rows"
-        :initialPageSize="5"
-        :useActions="true"
-        @delete="onDeleteProject($event)"
-    >
+    <DataTable :columns="cols" :rows="rows" :initialPageSize="5">
+        <template #title>Projects</template>
+
+        <!-- custom cell for name -->
         <template #cell-status="{ row }">
             <div class="font-medium">
                 <span
@@ -61,3 +51,5 @@ const onDeleteProject = (projectId) => {
         </template>
     </DataTable>
 </template>
+
+<style lang="scss" scoped></style>
