@@ -1,3 +1,12 @@
+<script setup>
+const props = defineProps({
+    members: {
+        type: Array,
+        required: true,
+    },
+});
+</script>
+
 <template>
     <div
         class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
@@ -38,8 +47,8 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <tr
-                        v-for="(user, index) in users"
-                        :key="index"
+                        v-for="user in members"
+                        :key="user.id"
                         class="border-t border-gray-100 dark:border-gray-800"
                     >
                         <td class="px-5 py-4 sm:px-6">
@@ -54,7 +63,16 @@
                                 <div
                                     class="w-10 h-10 overflow-hidden rounded-full"
                                 >
-                                    <img :src="user.avatar" :alt="user.name" />
+                                    <img
+                                        v-if="user.profile_picture"
+                                        :src="user.profile_picture"
+                                        :alt="user.name"
+                                    />
+                                    <img
+                                        v-else
+                                        :src="'/images/user/profile.jpg'"
+                                        alt="Profile"
+                                    />
                                 </div>
                                 <div>
                                     <span
@@ -69,7 +87,7 @@
                             <p
                                 class="block text-gray-500 text-theme-xs dark:text-gray-400"
                             >
-                                {{ user.role }}
+                                {{ user.role.name }}
                             </p>
                         </td>
                         <td class="px-5 py-4 sm:px-6">
@@ -85,45 +103,3 @@
         </div>
     </div>
 </template>
-
-<script setup>
-import { ref } from "vue";
-
-const users = ref([
-    {
-        id: 1,
-        name: "Lindsey Curtis",
-        role: "Web Designer",
-        avatar: "/images/user/user-17.jpg",
-        email: "lindsey@gmail.com",
-    },
-    {
-        id: 2,
-        name: "Kaiya George",
-        role: "Project Manager",
-        avatar: "/images/user/user-18.jpg",
-        email: "kaiya@gmail.com",
-    },
-    {
-        id: 3,
-        name: "Zain Geidt",
-        role: "Content Writer",
-        avatar: "/images/user/user-19.jpg",
-        email: "zain@gmail.com",
-    },
-    {
-        id: 4,
-        name: "Abram Schleifer",
-        role: "Digital Marketer",
-        avatar: "/images/user/user-20.jpg",
-        email: "abram@gmail.com",
-    },
-    {
-        id: 5,
-        name: "Carla George",
-        role: "Front-end Developer",
-        avatar: "/images/user/user-21.jpg",
-        email: "carla@gmail.com",
-    },
-]);
-</script>

@@ -1,3 +1,27 @@
+<script setup>
+const props = defineProps({
+    tasks: {
+        type: Array,
+        required: true,
+    },
+});
+import Button from "@/components/ui/Button.vue";
+import TrashIcon from "@/icons/TrashIcon.vue";
+import { useForm } from "@inertiajs/vue3";
+const form = useForm();
+const deleteTask = (taskId) => {
+    if (confirm("Are you sure you want to delete this task?")) {
+        form.delete(`/tasks/${taskId}`, {
+            onSuccess: () => {
+                console.log(`Task with ID ${taskId} deleted successfully.`);
+            },
+        });
+    } else {
+        console.log("Task deletion cancelled.");
+    }
+};
+</script>
+
 <template>
     <div
         class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6"
@@ -68,46 +92,60 @@
             <table class="min-w-full">
                 <thead>
                     <tr class="border-t border-gray-100 dark:border-gray-800">
-                        <th class="py-3 text-left">
+                        <th class="py-3 text-left w-1/12 sm:px-6">
+                            <p
+                                class="font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                            >
+                                #ID
+                            </p>
+                        </th>
+                        <th class="py-3 text-left w-3/12 sm:px-6">
                             <p
                                 class="font-medium text-gray-500 text-theme-xs dark:text-gray-400"
                             >
                                 Name
                             </p>
                         </th>
-                        <th class="py-3 text-left">
+                        <th class="py-3 text-left w-3/12 sm:px-6">
                             <p
                                 class="font-medium text-gray-500 text-theme-xs dark:text-gray-400"
                             >
                                 Assignee
                             </p>
                         </th>
-                        <th class="py-3 text-left">
+                        <th class="py-3 text-left w-1/12 sm:px-6">
                             <p
                                 class="font-medium text-gray-500 text-theme-xs dark:text-gray-400"
                             >
                                 Priority
                             </p>
                         </th>
-                        <th class="py-3 text-left">
+                        <th class="py-3 text-left w-1/12 sm:px-6">
                             <p
                                 class="font-medium text-gray-500 text-theme-xs dark:text-gray-400"
                             >
                                 Status
                             </p>
                         </th>
-                        <th class="py-3 text-left">
+                        <th class="py-3 text-left w-2/12 sm:px-6">
                             <p
                                 class="font-medium text-gray-500 text-theme-xs dark:text-gray-400"
                             >
                                 Start Date
                             </p>
                         </th>
-                        <th class="py-3 text-left">
+                        <th class="py-3 text-left w-2/12 sm:px-6">
                             <p
                                 class="font-medium text-gray-500 text-theme-xs dark:text-gray-400"
                             >
                                 Due Date
+                            </p>
+                        </th>
+                        <th class="px-5 py-3 text-left w-1/12 sm:px-6">
+                            <p
+                                class="font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                            >
+                                Actions
                             </p>
                         </th>
                     </tr>
@@ -118,6 +156,17 @@
                         :key="index"
                         class="border-t border-gray-100 dark:border-gray-800"
                     >
+                        <td class="py-3 whitespace-nowrap">
+                            <div class="flex items-center gap-3">
+                                <div>
+                                    <p
+                                        class="font-medium text-gray-800 text-theme-sm dark:text-white/90"
+                                    >
+                                        {{ task.id }}
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
                         <td class="py-3 whitespace-nowrap">
                             <div class="flex items-center gap-3">
                                 <div>
@@ -135,20 +184,26 @@
                                     class="w-10 h-10 overflow-hidden rounded-full"
                                 >
                                     <img
-                                        :src="task.user.avatar"
-                                        :alt="task.user.name"
+                                        v-if="task.assignee.profile_picture"
+                                        :src="task.assignee.profile_picture"
+                                        :alt="task.assignee.name"
+                                    />
+                                    <img
+                                        v-else
+                                        :src="'/images/user/profile.jpg'"
+                                        alt="Profile"
                                     />
                                 </div>
                                 <div>
                                     <span
                                         class="block font-medium text-gray-800 text-theme-sm dark:text-white/90"
                                     >
-                                        {{ task.user.name }}
+                                        {{ task.assignee.name }}
                                     </span>
                                     <span
                                         class="block text-gray-500 text-theme-xs dark:text-gray-400"
                                     >
-                                        {{ task.user.role }}
+                                        {{ task.assignee.role.name }}
                                     </span>
                                 </div>
                             </div>
@@ -161,14 +216,19 @@
                                     :class="{
                                         'rounded-full px-2 py-0.5 text-theme-xs font-medium': true,
                                         'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500':
-                                            task.priority === 'Low',
+                                            task.priority === 'low',
                                         'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-orange-400':
-                                            task.priority === 'Medium',
+                                            task.priority === 'medium',
                                         'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500':
-                                            task.priority === 'High',
+                                            task.priority === 'high',
                                     }"
                                 >
-                                    {{ task.priority }}
+                                    {{
+                                        String(task.priority)
+                                            .charAt(0)
+                                            .toUpperCase() +
+                                        String(task.priority).slice(1)
+                                    }}
                                 </span>
                             </p>
                         </td>
@@ -176,15 +236,20 @@
                             <span
                                 :class="{
                                     'rounded-full px-2 py-0.5 text-theme-xs font-medium': true,
-                                    'bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500':
-                                        task.status === 'Delivered',
-                                    'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-orange-400':
-                                        task.status === 'Pending',
-                                    'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500':
-                                        task.status === 'Canceled',
+                                    'bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-500':
+                                        task.status === 'completed',
+                                    'bg-warning-100 text-warning-700 dark:bg-warning-500/15 dark:text-warning-400':
+                                        task.status === 'pending',
+                                    'bg-success-100 text-success-700 dark:bg-success-500/15 dark:text-success-500':
+                                        task.status === 'in_progress',
                                 }"
                             >
-                                {{ task.status }}
+                                {{
+                                    String(task.status)
+                                        .charAt(0)
+                                        .toUpperCase() +
+                                    String(task.status).slice(1)
+                                }}
                             </span>
                         </td>
                         <td class="py-3 whitespace-nowrap">
@@ -201,86 +266,20 @@
                                 {{ task.due_date }}
                             </p>
                         </td>
+                        <td
+                            class="px-5 py-4 sm:px-6"
+                            :id="'table-dropdown-' + task.id"
+                        >
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                :endIcon="TrashIcon"
+                                @click="deleteTask(task.id)"
+                            />
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </template>
-
-<script setup>
-import { ref } from "vue";
-
-const tasks = ref([
-    {
-        name: "Design Home Page",
-        image: "/public/images/product/product-01.jpg",
-        assignee: "Jon Doe",
-        start_date: "10-10-2025",
-        due_date: "12-10-2025",
-        priority: "High",
-        status: "Delivered",
-        user: {
-            name: "Jon Doe",
-            role: "UI Designer",
-            avatar: "/images/user/user-01.jpg",
-        },
-    },
-    {
-        name: "Design About Us Page",
-        image: "/public/images/product/product-02.jpg",
-        assignee: "Smith",
-        start_date: "11-10-2025",
-        due_date: "13-10-2025",
-        priority: "Low",
-        status: "Pending",
-        user: {
-            name: "Smith",
-            role: "UX Designer",
-            avatar: "/images/user/user-02.jpg",
-        },
-    },
-    {
-        name: "Draw Class Diagram",
-        image: "/public/images/product/product-03.jpg",
-        assignee: "Alice",
-        start_date: "4-10-2025",
-        due_date: "5-10-2025",
-        priority: "Medium",
-        status: "Delivered",
-        user: {
-            name: "Alice",
-            role: "System Analyst",
-            avatar: "/images/user/user-03.jpg",
-        },
-    },
-    {
-        name: "Draw Use Case Diagram",
-        image: "/public/images/product/product-04.jpg",
-        assignee: "Jonny",
-        start_date: "6-10-2025",
-        due_date: "7-10-2025",
-        priority: "High",
-        status: "Canceled",
-        user: {
-            name: "Jonny",
-            role: "Business Analyst",
-            avatar: "/images/user/user-04.jpg",
-        },
-    },
-    {
-        name: "Draw Sequence Diagram",
-        image: "/public/images/product/product-05.jpg",
-        assignee: "Scarlet",
-        start_date: "8-10-2025",
-        due_date: "9-10-2025",
-        priority: "Low",
-        status: "Delivered",
-        user: {
-            name: "Scarlet",
-            role: "Developer",
-            avatar: "/images/user/user-05.jpg",
-        },
-    },
-]);
-</script>

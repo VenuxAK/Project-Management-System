@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Member\MemberController;
 use App\Http\Controllers\Project\ProjectController;
+use App\Http\Controllers\Task\TaskController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,13 +15,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/projects', [ProjectController::class, "store"])->name('projects.view.post');
     Route::delete('/projects/{id}', [ProjectController::class, "destroy"])->name('projects.delete');
 
-    Route::get('/tasks', function () {
-        return Inertia::render('Task/Index');
-    })->name('tasks.view');
+    Route::get('/tasks', [TaskController::class, "index"])->name('tasks.view');
+    Route::post('/tasks', [TaskController::class, "store"])->name('tasks.view.post');
+    Route::delete('/tasks/{id}', [TaskController::class, "destroy"])->name('tasks.view.delete');
 
-    Route::get('/members', function () {
-        return Inertia::render('Member/Index');
-    })->name('members.view');
+    Route::get('/members', [MemberController::class, "index"])->name('members.view');
 });
 
 

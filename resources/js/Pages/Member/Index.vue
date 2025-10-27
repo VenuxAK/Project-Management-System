@@ -2,7 +2,7 @@
     <AdminLayout>
         <PageBreadcrumb pageTitle="Members" class="mb-4" />
 
-        <MemberTable />
+        <MemberTable :members="members" />
     </AdminLayout>
 </template>
 
@@ -15,6 +15,13 @@ import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 
 defineOptions({
     layout: SidebarProvider,
+});
+
+defineProps({
+    members: {
+        type: Array,
+        required: true,
+    },
 });
 </script>
 

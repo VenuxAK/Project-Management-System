@@ -9,10 +9,7 @@ const props = defineProps({
     },
 });
 
-const model = defineModel({
-    type: String,
-    default: null,
-});
+const model = defineModel();
 </script>
 
 <template>
