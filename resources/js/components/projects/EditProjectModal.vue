@@ -1,59 +1,61 @@
 <script setup>
-import Modal from "@/components/ui/Modal.vue";
 import { useForm } from "@inertiajs/vue3";
-import CrossIcon from "@/icons/CrossIcon.vue";
 import DatePicker from "@/components/FormElements/DatePicker.vue";
 import InputText from "@/components/FormElements/InputText.vue";
 import InputLabel from "@/components/FormElements/InputLabel.vue";
 import InputError from "@/components/FormElements/InputError.vue";
 import SelectBox from "@/components/FormElements/SelectBox.vue";
+import Modal from "@/components/ui/Modal.vue";
 import Button from "@/components/ui/Button.vue";
+import CrossIcon from "@/icons/CrossIcon.vue";
 import { useProjectManager } from "@/composables/useProjectManager";
-import { onMounted } from "vue";
 
 const props = defineProps({
-    isProjectModalOpen: {
+    project: {
+        type: Object,
+        required: true,
+    },
+    isEditProjectModalOpen: {
         type: Boolean,
         required: true,
     },
 });
-const emit = defineEmits(["update:isProjectModalOpen"]);
-const { projectStatuses, createProject } = useProjectManager();
+const emit = defineEmits(["update:isEditProjectModalOpen"]);
+const { projectStatuses, updateProject } = useProjectManager();
 
 const formData = useForm({
-    name: "",
-    status: "",
-    start_date: null,
-    deadline: null,
+    name: props.project.name,
+    status: props.project.status,
+    start_date: props.project.start_date,
+    deadline: props.project.deadline,
 });
 
-const saveProject = () => {
-    createProject(formData, {
+const closeEditProjectModal = () => {
+    emit("update:isEditProjectModalOpen", false);
+    formData.reset();
+};
+
+const onUpdateProject = () => {
+    updateProject(props.project.id, formData, {
         onSuccess: () => {
-            closeProjectModal();
+            closeEditProjectModal();
         },
     });
 };
-
-const closeProjectModal = () => {
-    formData.reset();
-    formData.clearErrors();
-    emit("update:isProjectModalOpen", false);
-};
 // onMounted(() => {
-//     console.log("Create Project Mounted");
+// console.log(`Project ${props.project.id} found.`);
 // });
 </script>
 
 <template>
-    <Modal v-if="isProjectModalOpen" @close="closeProjectModal()">
+    <Modal v-if="isEditProjectModalOpen" @close="closeEditProjectModal()">
         <template #body>
             <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 class="absolute right-5 top-5 z-999 rounded-full p-0.5 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:bg-white/[0.07] dark:hover:text-gray-300"
-                @click="closeProjectModal()"
+                @click="closeEditProjectModal()"
             >
                 <CrossIcon />
             </Button>
@@ -61,10 +63,10 @@ const closeProjectModal = () => {
                 <h4
                     class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90"
                 >
-                    Create a new project
+                    Edit project
                 </h4>
             </div>
-            <form @submit.prevent="saveProject" class="flex flex-col">
+            <form @submit.prevent="onUpdateProject" class="flex flex-col">
                 <div class="custom-scrollbar h-[458px] overflow-y-auto p-2">
                     <div class="space-y-6">
                         <div>
@@ -111,12 +113,12 @@ const closeProjectModal = () => {
                         type="button"
                         variant="outline"
                         size="sm"
-                        @click="closeProjectModal()"
+                        @click="closeEditProjectModal()"
                     >
                         Close
                     </Button>
                     <Button type="submit" variant="primary" size="sm">
-                        Save Project
+                        Save Changes
                     </Button>
                 </div>
             </form>

@@ -1,12 +1,12 @@
 <script setup>
-import { defineOptions, ref } from "vue";
+import { computed, defineOptions, ref } from "vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import SidebarProvider from "@/components/layout/SidebarProvider.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import Button from "@/components/ui/Button.vue";
 import PlusIcon from "@/icons/PlusIcon.vue";
 import CreateTaskModal from "@/components/tasks/CreateTaskModal.vue";
-import TaskDataTable from "../../components/tasks/TaskDataTable.vue";
+import TaskDataTable from "@/components/tasks/TaskDataTable.vue";
 
 defineOptions({
     layout: SidebarProvider,
@@ -30,6 +30,19 @@ const props = defineProps({
 });
 
 const isTaskModalOpen = ref(false);
+
+const computedProjects = computed(() => {
+    return props.projects.map((project) => ({
+        value: project.id,
+        label: project.name,
+    }));
+});
+const computedUsers = computed(() => {
+    return props.users.map((user) => ({
+        value: user.id,
+        label: user.name,
+    }));
+});
 </script>
 
 <template>
@@ -47,12 +60,17 @@ const isTaskModalOpen = ref(false);
             </Button>
         </div>
         <CreateTaskModal
+            v-if="isTaskModalOpen"
             :isTaskModalOpen="isTaskModalOpen"
             @update:isTaskModalOpen="isTaskModalOpen = false"
-            :projects="projects"
-            :users="users"
+            :projects="computedProjects"
+            :users="computedUsers"
         />
-        <TaskDataTable :tasks="tasks" />
+        <TaskDataTable
+            :tasks="tasks"
+            :projects="computedProjects"
+            :users="computedUsers"
+        />
     </AdminLayout>
 </template>
 

@@ -1,15 +1,26 @@
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import DataTable from "@/components/ui/DataTable.vue";
 import { useTaskManager } from "@/composables/useTaskManager.js";
+import EditTaskModal from "@/components/tasks/EditTaskModal.vue";
 
 const props = defineProps({
     tasks: {
         type: Array,
         required: true,
     },
+    projects: {
+        type: Array,
+        required: false,
+        default: [],
+    },
+    users: {
+        type: Array,
+        required: false,
+        default: [],
+    },
 });
-const { deleteTask } = useTaskManager();
+const { deleteTask, updateStatus } = useTaskManager();
 
 const cols = [
     { label: "#ID", key: "id", sortable: true },
@@ -35,17 +46,54 @@ const rows = computed(() => {
     });
 });
 
-const onDeleteTask = (id) => {
-    deleteTask(id);
+const onDeleteTask = (task) => {
+    deleteTask(task.id);
+};
+
+const isEditTaskModalOpen = ref(false);
+const selectedTask = ref({});
+const onEditTask = (tk) => {
+    isEditTaskModalOpen.value = true;
+    const tmp_tk = props.tasks.filter((task) => {
+        return task.id === tk.id;
+    });
+    selectedTask.value = tmp_tk.map((tk) => {
+        return {
+            id: tk.id,
+            name: tk.name,
+            status: tk.status,
+            priority: tk.priority,
+            assigned_to: tk.assigned_to,
+            project_id: tk.project_id,
+            start_date: tk.start_date,
+            due_date: tk.due_date,
+        };
+    })[0];
+};
+
+const onUpdateStatus = (task) => {
+    updateStatus(task.id);
 };
 </script>
 <template>
+    <EditTaskModal
+        v-if="isEditTaskModalOpen"
+        :isEditTaskModalOpen="isEditTaskModalOpen"
+        @update:isEditTaskModalOpen="(e) => (isEditTaskModalOpen = e)"
+        :task="selectedTask"
+        :users="users"
+        :projects="projects"
+    />
     <DataTable
         :columns="cols"
         :rows="rows"
         :initialPageSize="5"
-        :useActions="true"
+        :deleteAction="true"
+        :editAction="true"
+        :updateStatusAction="true"
         @delete="onDeleteTask($event)"
+        @edit="onEditTask($event)"
+        @updateStatus="onUpdateStatus($event)"
     >
         <template #title>Projects</template>
 

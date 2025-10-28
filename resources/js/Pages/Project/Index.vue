@@ -36,6 +36,7 @@ const isProjectModalOpen = ref(false);
             </Button>
         </div>
         <CreateProjectModal
+            v-if="isProjectModalOpen"
             :isProjectModalOpen="isProjectModalOpen"
             @update:isProjectModalOpen="(e) => (isProjectModalOpen = e)"
         />

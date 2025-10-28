@@ -14,6 +14,7 @@ class ProjectController extends Controller
     {
         return Inertia::render('Project/Index', [
             "projects" => Project::with("creator")->latest()->get(),
+            'project' => Inertia::optional(fn() => Project::where('id', $request->pj_id)->get())
         ]);
     }
 
@@ -37,6 +38,26 @@ class ProjectController extends Controller
         ]);
 
         return redirect()->route('projects.view')->with('success', 'Project created successfully.');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $project = Project::findOrFail($id);
+        $request->validate([
+            "name" => ["required", "string"],
+            "status" => ["required", "in:planning,active,completed,on-hold"],
+            "start_date" => ["required", "date"],
+            "deadline" => ["required", "date", "after_or_equal:start_date"],
+        ]);
+
+        $project->update([
+            "name" => $request->name,
+            "status" => $request->status,
+            "start_date" => $request->start_date,
+            "deadline" => $request->deadline,
+        ]);
+
+        return back()->with('success', 'Project ' . $project->id . ' was updated!');
     }
 
     public function destroy(Request $request, $id)

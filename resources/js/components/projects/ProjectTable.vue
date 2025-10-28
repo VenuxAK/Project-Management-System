@@ -1,6 +1,8 @@
 <script setup>
 import DataTable from "@/components/ui/DataTable.vue";
 import { useProjectManager } from "@/composables/useProjectManager";
+import EditProjectModal from "@/components/projects/EditProjectModal.vue";
+import { computed, ref } from "vue";
 
 const { deleteProject } = useProjectManager();
 
@@ -19,26 +21,46 @@ const cols = [
     { label: "Deadline", key: "deadline", sortable: true },
 ];
 
-const rows = props.projects.map((project) => ({
-    id: project.id,
-    name: project.name,
-    status: project.status,
-    start_date: project.start_date,
-    deadline: project.deadline,
-}));
+const rows = computed(() => {
+    return props.projects.map((project) => {
+        return {
+            id: project.id,
+            name: project.name,
+            status: project.status,
+            start_date: project.start_date,
+            deadline: project.deadline,
+        };
+    });
+});
 
-const onDeleteProject = (projectId) => {
-    deleteProject(projectId);
+const onDeleteProject = (project) => {
+    deleteProject(project.id);
+};
+
+const isEditProjectModalOpen = ref(false);
+const project = ref({});
+const onEditProject = (pj) => {
+    // console.log(pj.id);
+    isEditProjectModalOpen.value = true;
+    project.value = pj;
 };
 </script>
 
 <template>
+    <EditProjectModal
+        v-if="isEditProjectModalOpen"
+        :isEditProjectModalOpen="isEditProjectModalOpen"
+        @update:isEditProjectModalOpen="(e) => (isEditProjectModalOpen = e)"
+        :project="project"
+    />
     <DataTable
         :columns="cols"
         :rows="rows"
         :initialPageSize="5"
-        :useActions="true"
+        :editAction="true"
+        :deleteAction="true"
         @delete="onDeleteProject($event)"
+        @edit="onEditProject($event)"
     >
         <template #cell-status="{ row }">
             <div class="font-medium">

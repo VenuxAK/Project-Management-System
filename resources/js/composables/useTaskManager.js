@@ -1,19 +1,47 @@
-import { useForm } from "@inertiajs/vue3";
+import { useResourceManager } from "./useResourceManager";
 
-const form = useForm();
+const defaultTaskFields = {
+    name: "",
+    priority: "",
+    status: "",
+    start_date: "",
+    due_date: "",
+    assigned_to: "",
+    project_id: "",
+};
 
 export const useTaskManager = () => {
-    const deleteTask = (id) => {
-        if (confirm("Are you sure you want to delete this task?")) {
-            form.delete(`/tasks/${id}`, {
-                onSuccess: () => {
-                    console.log(`Task with ID ${id} deleted successfully.`);
-                },
-            });
-        } else {
-            console.log("Task deletion cancelled.");
-        }
+    const { create, update, remove, makeForm } = useResourceManager(
+        "/tasks",
+        defaultTaskFields
+    );
+    const taskStatuses = [
+        { value: "pending", label: "Pending" },
+        { value: "in_progress", label: "In Progress" },
+        { value: "completed", label: "Completed" },
+    ];
+    const taskPriorities = [
+        { value: "low", label: "Low" },
+        { value: "medium", label: "Medium" },
+        { value: "high", label: "High" },
+    ];
+
+    const updateStatus = (taskID) => {
+        makeForm().patch(`/tasks/${taskID}/update-status`, {
+            onSuccess: () => {},
+            onError: (errors) => {
+                console.log(errors);
+            },
+        });
     };
 
-    return { deleteTask };
+    return {
+        createTask: create,
+        updateTask: update,
+        deleteTask: remove,
+        makeTaskForm: makeForm,
+        updateStatus,
+        taskPriorities,
+        taskStatuses,
+    };
 };

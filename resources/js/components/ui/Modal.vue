@@ -7,7 +7,11 @@
             aria-hidden="true"
             @click="$emit('close')"
         ></div>
-        <slot name="body"></slot>
+        <div
+            class="no-scrollbar relative w-full max-w-[680px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11"
+        >
+            <slot name="body"></slot>
+        </div>
     </div>
 </template>
 

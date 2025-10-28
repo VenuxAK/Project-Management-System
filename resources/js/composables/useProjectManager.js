@@ -1,19 +1,30 @@
-import { useForm } from "@inertiajs/vue3";
-
-const form = useForm();
+import { useResourceManager } from "@/composables/useResourceManager";
+const defaultProjectFields = {
+    name: "",
+    status: "",
+    start_date: null,
+    deadline: null,
+};
 
 export const useProjectManager = () => {
-    const deleteProject = (id) => {
-        if (confirm("Are you sure you want to delete this project?")) {
-            form.delete(`/projects/${id}`, {
-                onSuccess: () => {
-                    console.log(`Project with ID ${id} deleted successfully.`);
-                },
-            });
-        } else {
-            console.log("Project deletion cancelled.");
-        }
-    };
+    const { create, update, remove, makeForm } = useResourceManager(
+        "/projects",
+        defaultProjectFields
+    );
 
-    return { deleteProject };
+    const projectStatuses = [
+        { value: "planning", label: "Planning" },
+        { value: "active", label: "Active" },
+        { value: "completed", label: "Completed" },
+        { value: "on-hold", label: "On Hold" },
+    ];
+
+    return {
+        // functions kept simple names compatible with existing code
+        createProject: create,
+        updateProject: update,
+        deleteProject: remove,
+        makeProjectForm: makeForm,
+        projectStatuses,
+    };
 };
