@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Project;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Projects\CreateProjectRequest;
+use App\Http\Requests\Projects\DeleteProjectRequest;
+use App\Http\Requests\Projects\UpdateProjectRequest;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,22 +15,23 @@ class ProjectController extends Controller
 {
     public function index(Request $request)
     {
+        $projects = Project::query(); // Initialize project query builder
+
+        if ($request->user()->isAdministrator()) {
+            $projects = $projects->with("creator"); // Eager load creator relationship
+        }
+        if ($request->user()->isProjectManager()) {
+            $projects = $projects->where('created_by', $request->user()->id); // Filter projects by creator
+        }
+
         return Inertia::render('Project/Index', [
-            "projects" => Project::with("creator")->latest()->get(),
-            'project' => Inertia::optional(fn() => Project::where('id', $request->pj_id)->get())
+            "projects" => $projects->latest()->get(),
+            'project' => Inertia::optional(fn() => Project::where('id', $request->pj_id)->get()) // Load specific project if pj_id is provided
         ]);
     }
 
-    public function store(Request $request)
+    public function store(CreateProjectRequest $request)
     {
-        // Validate and store the project data
-        $request->validate([
-            "name" => ["required", "string", "max:255"],
-            "status" => ["required", "in:planning,active,completed,on-hold"],
-            "start_date" => ["required", "date"],
-            "deadline" => ["required", "date", "after_or_equal:start_date"],
-        ]);
-
         Project::create([
             "name" => $request->name,
             "status" => $request->status,
@@ -40,16 +44,8 @@ class ProjectController extends Controller
         return redirect()->route('projects.view')->with('success', 'Project created successfully.');
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateProjectRequest $request, Project $project)
     {
-        $project = Project::findOrFail($id);
-        $request->validate([
-            "name" => ["required", "string"],
-            "status" => ["required", "in:planning,active,completed,on-hold"],
-            "start_date" => ["required", "date"],
-            "deadline" => ["required", "date", "after_or_equal:start_date"],
-        ]);
-
         $project->update([
             "name" => $request->name,
             "status" => $request->status,
@@ -60,9 +56,8 @@ class ProjectController extends Controller
         return back()->with('success', 'Project ' . $project->id . ' was updated!');
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(DeleteProjectRequest $request, Project $project)
     {
-        $project = Project::findOrFail($id);
         $project->delete();
 
         return back()->with('success', 'Project deleted successfully.');

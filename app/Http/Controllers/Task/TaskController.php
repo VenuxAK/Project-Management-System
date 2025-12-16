@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Task;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreateTaskRequest;
+use App\Http\Requests\Tasks\CreateTaskRequest;
+use App\Http\Requests\Tasks\DeleteTaskRequest;
+use App\Http\Requests\Tasks\UpdateTaskRequest;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
@@ -13,28 +15,39 @@ use Inertia\Inertia;
 
 class TaskController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $tasks = Task::query();         // Initialize Task query builder
+        $projects = Project::query();   // Initialize Project query builder
+
+        if ($request->user()->isAdministrator()) {
+            $tasks = $tasks->with('assignee');
+        }
+        if ($request->user()->isProjectManager()) {
+            $tasks = $tasks->with('assignee')->where('created_by', $request->user()->id); // Filter tasks created by the project manager
+            $projects = $projects->where('created_by', $request->user()->id); // Filter projects created by the project manager
+        }
+        if ($request->user()->isEmployee()) {
+            $tasks = $tasks->with('assignee')->where('assigned_to', $request->user()->id); // Filter tasks assigned to the employee
+        }
 
         return Inertia::render('Task/Index', [
-            'tasks' => Task::with(['assignee'])->latest()->get(),
-            'projects' => Project::latest()->get(['id', 'name']),
+            'tasks' => $tasks->latest()->get(),
+            'projects' => $projects->latest()->get(['id', 'name']),
             'users' => User::where('role_id', '3')->get(['id', 'name']),
         ]);
     }
 
     public function store(CreateTaskRequest $request)
     {
-        $task = $request->validated();
-
-        $task = Task::create([
-            "name" => $task['name'],
-            "priority" => $task['priority'],
-            "status" => $task['status'],
-            "start_date" => $task['start_date'],
-            "due_date" => $task['due_date'],
-            "project_id" => $task['project_id'],
-            "assigned_to" => $task['assigned_to'],
+        Task::create([
+            "name" => $request->name,
+            "priority" => $request->priority,
+            "status" => $request->status,
+            "start_date" => $request->start_date,
+            "due_date" => $request->due_date,
+            "project_id" => $request->project_id,
+            "assigned_to" => $request->assigned_to,
             "created_by" => Auth::id(),
             "updated_by" => Auth::id(),
         ]);
@@ -42,19 +55,8 @@ class TaskController extends Controller
         return redirect()->route('tasks.view')->with('success', 'Task created successfully.');
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateTaskRequest $request, Task $task)
     {
-        $task = Task::findOrFail($id);
-        $request->validate([
-            "name" => ["required", "string"],
-            "priority" => ["required", "string", "in:low,medium,high"],
-            "status" => ["required", "string", "in:pending,in_progress,completed"],
-            "assigned_to" => ["required", "exists:users,id"],
-            "project_id" => ["required", "exists:projects,id"],
-            "start_date" => ["required", "date"],
-            "due_date" => ["required", "date", "after_or_equal:start_date"],
-        ]);
-
         $task->update([
             "name" => $request->name,
             "status" => $request->status,
@@ -68,9 +70,8 @@ class TaskController extends Controller
         return back()->with('success', 'Task Updated Successfully.');
     }
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, Task $task)
     {
-        $task = Task::findOrFail($id);
         $task->update([
             "status" => $task->status === "completed" ? "in_progress" : "completed"
         ]);
@@ -79,9 +80,8 @@ class TaskController extends Controller
     }
 
 
-    public function destroy(Request $request, $id)
+    public function destroy(DeleteTaskRequest $request, Task $task)
     {
-        $task = Task::findOrFail($id);
         $task->delete();
         return redirect()->route('tasks.view')->with('success', 'Task deleted successfully.');
     }

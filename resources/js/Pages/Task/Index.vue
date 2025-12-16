@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button.vue";
 import PlusIcon from "@/icons/PlusIcon.vue";
 import CreateTaskModal from "@/components/tasks/CreateTaskModal.vue";
 import TaskDataTable from "@/components/tasks/TaskDataTable.vue";
+import { usePage } from "@inertiajs/vue3";
 
 defineOptions({
     layout: SidebarProvider,
@@ -51,6 +52,7 @@ const computedUsers = computed(() => {
 
         <div class="my-6">
             <Button
+                v-if="usePage().props.auth.user.role_id != 3"
                 size="sm"
                 variant="outline"
                 :endIcon="PlusIcon"

@@ -5,6 +5,7 @@ import Button from "@/components/ui/Button.vue";
 import PlusIcon from "@/icons/PlusIcon.vue";
 import CreateMemberModal from "@/components/members/CreateMemberModal.vue";
 import EditMemberModal from "./EditMemberModal.vue";
+import { usePage } from "@inertiajs/vue3";
 
 const props = defineProps({
     members: {
@@ -85,6 +86,7 @@ const onEditMember = (member) => {
                 variant="outline"
                 :endIcon="PlusIcon"
                 @click="onCreateNewUser"
+                v-if="usePage().props.auth.user.role_id === 1"
             >
                 Create new user
             </Button>

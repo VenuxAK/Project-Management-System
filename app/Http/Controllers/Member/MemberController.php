@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
-use App\Models\Role;
+use App\Http\Requests\Projects\CreateMemberRequest;
+use App\Http\Requests\Projects\DeleteMemberRequest;
+use App\Http\Requests\Projects\UpdateMemberRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
@@ -18,16 +19,9 @@ class MemberController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(CreateMemberRequest $request)
     {
-        // Make Validation request
-        $request->validate([
-            "name" => ["required", "string", "min:3", "max:50"],
-            "email" => ["required", "string", "email", "lowercase", "unique:" . User::class],
-            "role_id" => ["required", "in:2,3"]
-        ]);
-
-        $member = User::create([
+        User::create([
             "name" => $request->name,
             "email" => $request->email,
             "role_id" => $request->role_id,
@@ -36,17 +30,10 @@ class MemberController extends Controller
 
         return back()->with('success', 'New user created successful');
     }
-    public function update(Request $request, $id)
+
+    public function update(UpdateMemberRequest $request, User $user)
     {
-        $member = User::findOrFail($id);
-
-        $request->validate([
-            "name" => ["required", "string", "min:3", "max:50"],
-            "email" => ["required", "string", "email", "lowercase", "exists:" . User::class],
-            "role_id" => ["required", "in:2,3"]
-        ]);
-
-        $member->update([
+        $user->update([
             "name" => $request->name,
             "email" => $request->email,
             "role_id" => $request->role_id,
@@ -54,11 +41,10 @@ class MemberController extends Controller
 
         return back()->with('success', 'User updated successful.');
     }
-    public function destroy(Request $request, $id)
-    {
-        $member = User::findOrFail($id);
 
-        $member->delete();
+    public function destroy(DeleteMemberRequest $request, User $user)
+    {
+        $user->delete();
 
         return back()->with('success', 'User deleted successful.');
     }
