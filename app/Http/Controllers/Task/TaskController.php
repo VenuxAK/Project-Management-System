@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Task;
 
+use App\Events\TaskAssigned;
+use App\Events\TaskStatusUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tasks\CreateTaskRequest;
 use App\Http\Requests\Tasks\DeleteTaskRequest;
@@ -40,7 +42,7 @@ class TaskController extends Controller
 
     public function store(CreateTaskRequest $request)
     {
-        Task::create([
+        $task = Task::create([
             "name" => $request->name,
             "priority" => $request->priority,
             "status" => $request->status,
@@ -51,6 +53,9 @@ class TaskController extends Controller
             "created_by" => Auth::id(),
             "updated_by" => Auth::id(),
         ]);
+
+        // Send event notification to the assigned user
+        event(new TaskAssigned($task));
 
         return redirect()->route('tasks.view')->with('success', 'Task created successfully.');
     }
@@ -73,8 +78,17 @@ class TaskController extends Controller
     public function updateStatus(Request $request, Task $task)
     {
         $task->update([
-            "status" => $task->status === "completed" ? "in_progress" : "completed"
+            "status" => $task->status === "completed" ? "in_progress" : "completed",
+            "updated_by" => Auth::id()
         ]);
+
+        if ($task->status === "completed") {
+            // Refresh task instance to get the latest data with relations
+            $task->refresh()->load('creator', 'updater');
+
+            // Send event notification about status update
+            event(new TaskStatusUpdated($task));
+        }
 
         return back()->with('success', 'Status updated successfully.');
     }

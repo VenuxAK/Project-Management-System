@@ -23,15 +23,19 @@ class Task extends Model
         "updated_by",
     ];
 
-    public function project() : BelongsTo
+    public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
-    public function creator() : BelongsTo
+    public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-    public function assignee() : BelongsTo
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+    public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
