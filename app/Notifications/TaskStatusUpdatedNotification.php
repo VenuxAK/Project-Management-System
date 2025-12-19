@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -15,7 +16,7 @@ class TaskStatusUpdatedNotification extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct(public Task $task, public $updater)
+    public function __construct(public Task $task, public User $actor)
     {
         //
     }
@@ -36,7 +37,7 @@ class TaskStatusUpdatedNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->from($this->updater->email, $this->updater->name)
+            ->from($this->actor->email, $this->actor->name)
             ->line('The status of your task has been updated')
             ->action('View Now', url('/tasks'));
     }

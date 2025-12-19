@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -15,7 +16,7 @@ class TaskAssignedNotification extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct(public Task $task, public $creator)
+    public function __construct(public Task $task, public User $actor)
     {
         //
     }
@@ -36,8 +37,8 @@ class TaskAssignedNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->from($this->creator->email, $this->creator->name)
-            ->line('You have been assigned a new task')
+            ->from($this->actor->email, $this->actor->name)
+            ->line("{$this->actor->name} assigned you a new task.")
             ->action('View Now', url('/tasks'));
     }
 

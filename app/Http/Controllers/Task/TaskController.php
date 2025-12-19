@@ -55,7 +55,11 @@ class TaskController extends Controller
         ]);
 
         // Send event notification to the assigned user
-        event(new TaskAssigned($task));
+        event(new TaskAssigned(
+            task: $task,
+            assignedUser: $task->assignee,
+            actor: Auth::user()
+        ));
 
         return redirect()->route('tasks.view')->with('success', 'Task created successfully.');
     }
@@ -87,7 +91,11 @@ class TaskController extends Controller
             $task->refresh()->load('creator', 'updater');
 
             // Send event notification about status update
-            event(new TaskStatusUpdated($task));
+            event(new TaskStatusUpdated(
+                task: $task,
+                creator: $task->creator,
+                actor: Auth::user()
+            ));
         }
 
         return back()->with('success', 'Status updated successfully.');

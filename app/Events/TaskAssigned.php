@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -18,8 +19,11 @@ class TaskAssigned
     /**
      * Create a new event instance.
      */
-    public function __construct(public Task $task)
-    {
+    public function __construct(
+        public Task $task,
+        public User $assignedUser,
+        public User $actor
+    ) {
         //
     }
 

@@ -6,6 +6,7 @@ use App\Events\TaskStatusUpdated;
 use App\Notifications\TaskStatusUpdatedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 
 class SendTaskStatusUpdatedNotification
@@ -24,11 +25,17 @@ class SendTaskStatusUpdatedNotification
     public function handle(TaskStatusUpdated $event): void
     {
         // Guard clause to prevent self-notifications
-        if ($event->task->creator->id === $event->task->updater->id || auth()->id === $event->task->updater->id) {
+        if ($event->creator->id === $event->actor->id) {
             return;
         }
 
         // Send notification to the creator
-        Notification::send($event->task->creator, new TaskStatusUpdatedNotification($event->task, $event->task->updater));
+        // Notification::send($event->task->creator, new TaskStatusUpdatedNotification($event->task, $event->task->updater));
+        $event->creator->notify(
+            new TaskStatusUpdatedNotification(
+                task: $event->task,
+                actor: $event->actor
+            )
+        );
     }
 }
