@@ -3,12 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
@@ -69,6 +70,26 @@ class User extends Authenticatable
         return $this->role->name === "Developer";
     }
 
+    /**
+     * Local Scopes
+     */
+    #[Scope]
+    public function scopeAdmin(Builder $query): Builder
+    {
+        return $query->where('role_id', "=", 1);
+    }
+    public function scopeProjectManager(Builder $query): Builder
+    {
+        return $query->where('role_id', "=", 2);
+    }
+    public function scopeEmployee(Builder $query): Builder
+    {
+        return $query->where('role_id', "=", 3);
+    }
+
+    /**
+     * Relationships
+     */
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
