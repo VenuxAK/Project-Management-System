@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notification;
 
 class TaskAssignedNotification extends Notification
 {
-    use Queueable;
+    // use Queueable;
 
     /**
      * Create a new notification instance.
@@ -37,7 +37,6 @@ class TaskAssignedNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->from($this->actor->email, $this->actor->name)
             ->line("{$this->actor->name} assigned you a new task.")
             ->action('View Now', url('/tasks'));
     }

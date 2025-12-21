@@ -37,8 +37,7 @@ class TaskStatusUpdatedNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->from($this->actor->email, $this->actor->name)
-            ->line('The status of your task has been updated')
+            ->line("The status of {$this->actor->name}'s task has been updated")
             ->action('View Now', url('/tasks'));
     }
 

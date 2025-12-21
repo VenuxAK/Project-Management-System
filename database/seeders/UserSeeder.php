@@ -30,12 +30,12 @@ class UserSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Minn ArKar',
-            'email' => 'minnarkar@example.com',
+            'email' => 'minnarkar.admin@example.com',
             'role_id' => 1,
         ]);
         User::factory()->create([
             'name' => 'ArKar Minn',
-            'email' => 'arkarminn@example.com',
+            'email' => 'arkarminn.pm@example.com',
             'role_id' => 2,
         ]);
         User::factory(8)->create();
