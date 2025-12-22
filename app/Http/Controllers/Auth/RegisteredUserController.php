@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,8 +28,10 @@ class RegisteredUserController extends Controller
             "name" => $request->name,
             "email" => $request->email,
             "password" => $request->password,
-            "role_id" => 3
         ]);
+
+        $devRole = Role::where('name', 'developer')->first('id');
+        $user->roles()->attach($devRole->id);
 
         Auth::login($user);
 

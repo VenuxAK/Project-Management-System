@@ -6,7 +6,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -26,11 +25,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id',
         'profile_picture'
     ];
 
-    protected $with = ['role'];
+    // protected $with = ['roles'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -55,53 +53,72 @@ class User extends Authenticatable
         ];
     }
 
-    public function isAdministrator()
-    {
-        return $this->role->name === "Admin";
-    }
-
-    public function isProjectManager()
-    {
-        return $this->role->name === "Project Manager";
-    }
-
-    public function isEmployee()
-    {
-        return $this->role->name === "Developer";
-    }
 
     /**
      * Local Scopes
      */
     #[Scope]
-    public function scopeAdmin(Builder $query): Builder
+    public function scopeOwner(Builder $query): Builder
     {
-        return $query->where('role_id', "=", 1);
+        return $query->with('roles')->whereHas('roles', function (Builder $query) {
+            $query->where('name', 'like', 'owner');
+        });
     }
-    public function scopeProjectManager(Builder $query): Builder
+    public function scopeOperationManager(Builder $query): Builder
     {
-        return $query->where('role_id', "=", 2);
+        return $query->with('roles')->whereHas('roles', function (Builder $query) {
+            $query->where('name', 'like', 'operation_manager');
+        });
+    }
+    public function scopeProjectLeader(Builder $query): Builder
+    {
+        return $query->with('roles')->whereHas('roles', function (Builder $query) {
+            $query->where('name', 'like', 'project_lead');
+        });
     }
     public function scopeEmployee(Builder $query): Builder
     {
-        return $query->where('role_id', "=", 3);
+        return $query->with('roles')->whereHas('roles', function (Builder $query) {
+            $query->where('name', 'like', 'developer')
+                ->orWhere('name', 'like', 'qa');
+        });
     }
 
-    /**
+    /*********************************
      * Relationships
-     */
-    public function role(): BelongsTo
+     *********************************/
+
+    public function roles(): BelongsToMany
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsToMany(Role::class, "user_roles");
     }
 
+    // Project scope roles
+    public function projectRoles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'project_user_roles')
+            ->withPivot('project_id')
+            ->withTimestamps();
+    }
+
+    // User's projects
     public function projects(): BelongsToMany
     {
-        return $this->belongsToMany(Project::class, "project_user");
+        return $this->belongsToMany(Project::class, "project_user_roles")
+            ->withPivot('role_id')
+            ->withTimestamps();
     }
+
+    // The project user created
     public function createdProjects(): HasMany
     {
         return $this->hasMany(Project::class, 'created_by');
+    }
+
+    // The project user updated
+    public function updatedProjects(): HasMany
+    {
+        return $this->hasMany(Project::class, "updated_by");
     }
 
     public function assignedTasks(): HasMany
@@ -112,5 +129,40 @@ class User extends Authenticatable
     public function createdTasks(): HasMany
     {
         return $this->hasMany(Task::class, 'created_by');
+    }
+
+    /**
+     * Helpers
+     */
+    public function hasRole(string $roleName, ?Project $project = null): bool
+    {
+        // Global role check
+        if ($project === null) {
+            return $this->roles()->where('name', $roleName)->exists();
+        }
+
+        // Project-scoped role check
+        return $this->projectRoles()->where('name', $roleName)
+            ->wherePivot('project_id', $project->id)->exists();
+    }
+
+    public function hasPermission(string $permission, ?Project $project = null): bool
+    {
+        $global = $this->roles()
+            ->whereHas('permissions', function (Builder $query) use ($permission) {
+                $query->where('name', $permission);
+            })->exists();
+
+        if ($global) return true;
+
+        if ($project) {
+            return $this->projectRoles()
+                ->wherePivot('project_id', $project->id)
+                ->whereHas('permissions', function (Builder $query) use ($permission) {
+                    $query->where('name', $permission);
+                })->exists();
+        }
+
+        return false;
     }
 }

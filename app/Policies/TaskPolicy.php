@@ -13,7 +13,7 @@ class TaskPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdministrator() ? true : false;
+        return $user->hasPermission('view_task');
     }
 
     /**
@@ -21,7 +21,7 @@ class TaskPolicy
      */
     public function view(User $user, Task $task): bool
     {
-        return $user->isAdministrator() || $user->isProjectManager() ? true : false;
+        return $user->can('viewAny', $task) && $task->isVisibleTo($user);
     }
 
     /**
@@ -29,8 +29,7 @@ class TaskPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdministrator()  || $user->isProjectManager() ? true : false;
-        // return false;
+        return $user->hasPermission('create_task');
     }
 
     /**
@@ -38,12 +37,14 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
-        if ($user->isAdministrator()) {
-            return true;
-        } elseif ($user->isProjectManager() && $task->creator->id === $user->id) {
-            return true;
-        }
-        return false;
+        // if($task->project()->)
+
+        // Can update any task in the project
+        if ($user->hasPermission('update_any_task', $task->project)) return true;
+
+        // Can update own task in the project
+        return $user->hasPermission('update_own_task', $task->project) &&
+            $task->assigned_to === $user->id;
     }
 
     /**
@@ -51,7 +52,8 @@ class TaskPolicy
      */
     public function updateStatus(User $user, Task $task): bool
     {
-        return true;
+        if ($user->hasPermission('update_any_task')) return true;   // Global scope permission
+        return $user->hasPermission('update_own_task', $task->project) && $task->assigned_to === $user->id; // Project scope permission
     }
 
     /**
@@ -59,12 +61,7 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
-        if ($user->isAdministrator()) {
-            return true;
-        } elseif ($user->isProjectManager() && $task->creator->id === $user->id) {
-            return true;
-        }
-        return false;
+        return $user->hasPermission('delete_task', $task->project);
     }
 
     /**
@@ -72,7 +69,7 @@ class TaskPolicy
      */
     public function restore(User $user, Task $task): bool
     {
-        return $user->isAdministrator() ? true : false;
+        return $user->hasRole('owner');
     }
 
     /**
@@ -80,6 +77,6 @@ class TaskPolicy
      */
     public function forceDelete(User $user, Task $task): bool
     {
-        return $user->isAdministrator() ? true : false;
+        return $user->hasRole('owner');
     }
 }

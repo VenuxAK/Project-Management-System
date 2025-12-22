@@ -57,7 +57,7 @@ const onEditTask = (tk) => {
     const tmp_tk = props.tasks.filter((task) => {
         return task.id === tk.id;
     });
-    selectedTask.value = tmp_tk.map((tk) => {
+    selectedTask.value = tmp_tk.map((tk) => {`  `
         return {
             id: tk.id,
             name: tk.name,

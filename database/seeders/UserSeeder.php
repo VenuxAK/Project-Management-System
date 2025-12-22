@@ -15,29 +15,60 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         /**
-         * Run first the Role and User Seeders
-         * Create Roles
+         * Run the Role seeder file first then run User Seeders
          */
-        Role::factory()->create([
-            'name' => 'Admin',
-        ]);
-        Role::factory()->create([
-            'name' => 'Project Manager',
-        ]);
-        Role::factory()->create([
-            'name' => 'Developer',
-        ]);
 
-        User::factory()->create([
+        // Owner / Founder
+        $ownerRole = Role::where('name', 'owner')->first();
+        $owner = User::factory()->create([
             'name' => 'Minn ArKar',
-            'email' => 'minnarkar.admin@example.com',
-            'role_id' => 1,
+            'email' => 'minnarkar.founder@example.com',
         ]);
-        User::factory()->create([
-            'name' => 'ArKar Minn',
-            'email' => 'arkarminn.pm@example.com',
-            'role_id' => 2,
+        $owner->roles()->attach($ownerRole->id);
+
+        // Operation Manager
+        $operationManagerRole = Role::where('name', 'operation_manager')->first();
+        $om = User::factory()->create([
+            'name' => 'Minn ArKar',
+            'email' => 'minnarkar.om@example.com',
         ]);
-        User::factory(8)->create();
+        $om->roles()->attach($operationManagerRole->id);
+
+        // // Project Leader
+        $projectLeaderRole = Role::where('name', 'project_lead')->first();
+        $pld = User::factory()->create([
+            'name' => 'Minn ArKar',
+            'email' => 'minnarkar.pld@example.com',
+        ]);
+        $pld->roles()->attach($projectLeaderRole->id);
+
+        // Developers
+        $developerRole = Role::where('name', 'developer')->first();
+
+        $developer = User::factory()->create([
+            'name' => 'Minn Arkar',
+            'email' => 'minnarkar.dev@example.com'
+        ]);
+        $developer->roles()->attach($developerRole->id);
+
+        $developers = User::factory(5)->create();
+        foreach ($developers as $developer) {
+            $developer->roles()->attach($developerRole);
+        }
+
+        // QA
+        $qaRole = Role::where('name', 'qa')->first();
+        $qa = User::factory()->create([
+            'name' => 'Minn Arkar',
+            'email' => 'minnarkar.qa@example.com'
+        ]);
+        $qa->roles()->attach($qaRole->id);
+
+        // Clients
+        $clients = User::factory(3)->create();
+        $clientRole = Role::where('name', 'client')->first();
+        foreach ($clients as $client) {
+            $client->roles()->attach($clientRole->id);
+        }
     }
 }

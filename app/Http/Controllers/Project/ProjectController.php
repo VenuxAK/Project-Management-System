@@ -9,24 +9,18 @@ use App\Http\Requests\Projects\UpdateProjectRequest;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
     public function index(Request $request)
     {
-        $projects = Project::query(); // Initialize project query builder
-
-        if ($request->user()->isAdministrator()) {
-            $projects = $projects->with("creator"); // Eager load creator relationship
-        }
-        if ($request->user()->isProjectManager()) {
-            $projects = $projects->where('created_by', $request->user()->id); // Filter projects by creator
-        }
+        Gate::authorize('viewAny', Project::class);
 
         return Inertia::render('Project/Index', [
-            "projects" => $projects->latest()->get(),
-            'project' => Inertia::optional(fn() => Project::where('id', $request->pj_id)->get()) // Load specific project if pj_id is provided
+            "projects" => Project::query()->visibleTo($request->user())->latest()->get(),
+            // 'project' => Inertia::optional(fn() => Project::where('id', $request->pj_id)->get()) // Load specific project if pj_id is provided
         ]);
     }
 

@@ -46,6 +46,24 @@ class Task extends Model
         return $query;
     }
 
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        // For Owner and Operation Manager
+        if ($user->hasPermission('view_all_tasks')) {
+            return $query;
+        }
+
+        // For project leader
+        if ($user->hasPermission('view_project_tasks')) {
+            $query->whereHas('project.members', function (Builder $q) use ($user) {
+                $q->where('users.id', $user->id);
+            });
+        }
+
+        // For task assignee (Dev, QA)
+        return $query->where('assigned_to', $user->id);
+    }
+
 
     /**
      * Relationships

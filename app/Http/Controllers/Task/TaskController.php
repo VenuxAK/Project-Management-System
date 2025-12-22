@@ -11,6 +11,7 @@ use App\Models\Task;
 use App\Models\User;
 use App\Services\Tasks\TaskService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class TaskController extends Controller
@@ -19,17 +20,12 @@ class TaskController extends Controller
 
     public function index(Request $request)
     {
-        $projects = Project::latest()
-            ->when(
-                $request->user()->isProjectManager(),
-                fn($query)
-                => $query->where('created_by', $request->user()->id)
-            );
+        Gate::authorize('viewAny', Task::class);
 
         return Inertia::render('Task/Index', [
-            'tasks' => Task::latest()->forUser($request->user())->get(),
-            'projects' => $projects->get(['id', 'name']),
-            'users' => User::latest()->employee()->get(['id', 'name']),
+            'tasks' => Task::with('assignee')->visibleTo($request->user())->latest()->get(),
+            'projects' => Project::query()->visibleTo($request->user())->latest()->get(['id', 'name']),
+            'users' => User::query()->employee()->latest()->get()
         ]);
     }
 
@@ -57,6 +53,8 @@ class TaskController extends Controller
 
     public function updateStatus(Request $request, Task $task)
     {
+        Gate::authorize('updateStatus', $task);
+
         $this->taskService->toggleStatus(
             task: $task,
             actor: $request->user()

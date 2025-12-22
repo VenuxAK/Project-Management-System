@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class ProjectPolicy
 {
@@ -13,7 +12,7 @@ class ProjectPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdministrator() ? true : false;
+        return $user->hasPermission('view_project');
     }
 
     /**
@@ -21,7 +20,7 @@ class ProjectPolicy
      */
     public function view(User $user, Project $project): bool
     {
-        return $user->isAdministrator() || $user->isProjectManager() ? true : false;
+        return $user->hasPermission('view_project', $project);
     }
 
     /**
@@ -29,7 +28,7 @@ class ProjectPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdministrator() || $user->isProjectManager() ? true : false;
+        return $user->hasPermission('create_project');
     }
 
     /**
@@ -37,12 +36,7 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
-        if ($user->isAdministrator()) {
-            return true;
-        } elseif ($user->isProjectManager() && $project->creator->id === $user->id) {
-            return true;
-        }
-        return false;
+        return $user->hasPermission('update_project', $project);
     }
 
     /**
@@ -50,12 +44,7 @@ class ProjectPolicy
      */
     public function delete(User $user, Project $project): bool
     {
-        if ($user->isAdministrator()) {
-            return true;
-        } elseif ($user->isProjectManager() && $project->creator->id === $user->id) {
-            return true;
-        }
-        return false;
+        return $user->hasPermission('delete_project', $project);
     }
 
     /**
@@ -63,7 +52,7 @@ class ProjectPolicy
      */
     public function restore(User $user, Project $project): bool
     {
-        return $user->isAdministrator() ? true : false;
+        return $user->hasRole('owner');
     }
 
     /**
@@ -71,6 +60,6 @@ class ProjectPolicy
      */
     public function forceDelete(User $user, Project $project): bool
     {
-        return $user->isAdministrator() ? true : false;
+        return $user->hasRole('owner');
     }
 }
