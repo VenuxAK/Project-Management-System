@@ -81,4 +81,9 @@ class TaskService implements TaskServiceInterface
             return $task;
         });
     }
+
+    public function delete(Task $task): void
+    {
+        $task->delete();
+    }
 }

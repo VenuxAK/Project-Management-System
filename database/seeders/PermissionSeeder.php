@@ -15,22 +15,23 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
             // Projects
-            'create_project',
-            'update_project',
             'view_project',
             'view_all_projects',
+            'create_project',
+            'update_project',
+            'update_any_project',
             'delete_project',
-            'force_delete_project',
+            'manage_project_members',
 
             // Tasks
             'view_task',
             'view_all_tasks',
             'view_project_tasks',
             'create_task',
+            'assign_task',
+            'update_task',
             'update_any_task',
-            'update_own_task',
             'delete_task',
-            'force_delete_task',
 
             // Users / System
             'manage_users',

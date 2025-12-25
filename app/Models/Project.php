@@ -62,4 +62,14 @@ class Project extends Model
             $q->where('users.id', $user->id);
         });
     }
+
+    public function hasMember(User $user): bool
+    {
+        return $this->members()->where('users.id', $user->id)->exists();
+    }
+    public function memberRole(User $user): ?Role
+    {
+        $member = $this->members()->where('users.id', $user->id)->first();
+        return $member?->pivot?->role;
+    }
 }

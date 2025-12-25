@@ -29,22 +29,6 @@ class Task extends Model
      * Local Scopes
      */
     #[Scope]
-    public function scopeForUser(Builder $query, User $user)
-    {
-        $query->when($user->isAdministrator() ?? false, function ($query) {
-            $query->with('assignee');
-        });
-
-        $query->when($user->isProjectManager() ?? false, function ($query) use ($user) {
-            $query->with('assignee')->where('created_by', "=", $user->id);
-        });
-
-        $query->when($user->isEmployee() ?? false, function ($query) use ($user) {
-            $query->with('assignee')->where('assigned_to', "=", $user->id);
-        });
-
-        return $query;
-    }
 
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
@@ -53,14 +37,18 @@ class Task extends Model
             return $query;
         }
 
+        // return $query->whereHas('project.members', function (Builder $q) use ($user) {
+        //     $q->where('users.id', $user->id);
+        // });
+
         // For project leader
-        if ($user->hasPermission('view_project_tasks')) {
-            $query->whereHas('project.members', function (Builder $q) use ($user) {
+        if ($user->hasPermission('view_task')) {
+            return $query->whereHas('project.members', function (Builder $q) use ($user) {
                 $q->where('users.id', $user->id);
             });
         }
 
-        // For task assignee (Dev, QA)
+        // // For task assignee (Dev, QA)
         return $query->where('assigned_to', $user->id);
     }
 

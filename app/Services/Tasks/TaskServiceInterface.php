@@ -14,4 +14,6 @@ interface TaskServiceInterface
     public function update(Task $task, array $data, User $actor): Task;
 
     public function toggleStatus(Task $task, User $actor): Task;
+
+    public function delete(Task $task): void;
 }

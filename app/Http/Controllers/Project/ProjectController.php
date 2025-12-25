@@ -7,13 +7,16 @@ use App\Http\Requests\Projects\CreateProjectRequest;
 use App\Http\Requests\Projects\DeleteProjectRequest;
 use App\Http\Requests\Projects\UpdateProjectRequest;
 use App\Models\Project;
+use App\Services\Projects\ProjectServiceInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
+
+    public function __construct(private ProjectServiceInterface $projectService) {}
+
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Project::class);
@@ -26,33 +29,21 @@ class ProjectController extends Controller
 
     public function store(CreateProjectRequest $request)
     {
-        Project::create([
-            "name" => $request->name,
-            "status" => $request->status,
-            "start_date" => $request->start_date,
-            "deadline" => $request->deadline,
-            "created_by" => Auth::id(),
-            "updated_by" => Auth::id(),
-        ]);
+        $this->projectService->create($request->validated(), $request->user());
 
         return redirect()->route('projects.view')->with('success', 'Project created successfully.');
     }
 
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        $project->update([
-            "name" => $request->name,
-            "status" => $request->status,
-            "start_date" => $request->start_date,
-            "deadline" => $request->deadline,
-        ]);
+        $this->projectService->update($project, $request->validated(), $request->user());
 
         return back()->with('success', 'Project ' . $project->id . ' was updated!');
     }
 
     public function destroy(DeleteProjectRequest $request, Project $project)
     {
-        $project->delete();
+        $this->projectService->delete($project);
 
         return back()->with('success', 'Project deleted successfully.');
     }

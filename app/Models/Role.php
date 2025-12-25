@@ -45,4 +45,9 @@ class Role extends Model
     {
         return $this->scope === "project";
     }
+
+    public function hasPermission(string $permission): bool
+    {
+        return $this->permissions()->where('name', $permission)->exists();
+    }
 }

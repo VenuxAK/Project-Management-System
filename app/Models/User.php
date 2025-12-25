@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Services\Projects\ProjectAccessService;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -58,24 +60,24 @@ class User extends Authenticatable
      * Local Scopes
      */
     #[Scope]
-    public function scopeOwner(Builder $query): Builder
-    {
-        return $query->with('roles')->whereHas('roles', function (Builder $query) {
-            $query->where('name', 'like', 'owner');
-        });
-    }
-    public function scopeOperationManager(Builder $query): Builder
-    {
-        return $query->with('roles')->whereHas('roles', function (Builder $query) {
-            $query->where('name', 'like', 'operation_manager');
-        });
-    }
-    public function scopeProjectLeader(Builder $query): Builder
-    {
-        return $query->with('roles')->whereHas('roles', function (Builder $query) {
-            $query->where('name', 'like', 'project_lead');
-        });
-    }
+    // public function scopeOwner(Builder $query): Builder
+    // {
+    //     return $query->with('roles')->whereHas('roles', function (Builder $query) {
+    //         $query->where('name', 'like', 'owner');
+    //     });
+    // }
+    // public function scopeOperationManager(Builder $query): Builder
+    // {
+    //     return $query->with('roles')->whereHas('roles', function (Builder $query) {
+    //         $query->where('name', 'like', 'operation_manager');
+    //     });
+    // }
+    // public function scopeProjectLeader(Builder $query): Builder
+    // {
+    //     return $query->with('roles')->whereHas('roles', function (Builder $query) {
+    //         $query->where('name', 'like', 'project_lead');
+    //     });
+    // }
     public function scopeEmployee(Builder $query): Builder
     {
         return $query->with('roles')->whereHas('roles', function (Builder $query) {
@@ -83,6 +85,7 @@ class User extends Authenticatable
                 ->orWhere('name', 'like', 'qa');
         });
     }
+
 
     /*********************************
      * Relationships
@@ -148,21 +151,16 @@ class User extends Authenticatable
 
     public function hasPermission(string $permission, ?Project $project = null): bool
     {
-        $global = $this->roles()
-            ->whereHas('permissions', function (Builder $query) use ($permission) {
-                $query->where('name', $permission);
-            })->exists();
+        return app(ProjectAccessService::class)
+            ->can($this, $permission, $project);
+    }
 
-        if ($global) return true;
-
-        if ($project) {
-            return $this->projectRoles()
-                ->wherePivot('project_id', $project->id)
-                ->whereHas('permissions', function (Builder $query) use ($permission) {
-                    $query->where('name', $permission);
-                })->exists();
-        }
-
-        return false;
+    //
+    public function hasGlobalPermission(string $permission): bool
+    {
+        return $this->roles()->whereHas(
+            'permissions',
+            fn($query) => $query->where('name', $permission)
+        )->exists();
     }
 }

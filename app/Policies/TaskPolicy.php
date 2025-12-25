@@ -21,7 +21,7 @@ class TaskPolicy
      */
     public function view(User $user, Task $task): bool
     {
-        return $user->can('viewAny', $task) && $task->isVisibleTo($user);
+        return $user->hasPermission('view_task', $task->project);
     }
 
     /**
@@ -37,23 +37,19 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
-        // if($task->project()->)
-
-        // Can update any task in the project
-        if ($user->hasPermission('update_any_task', $task->project)) return true;
-
-        // Can update own task in the project
-        return $user->hasPermission('update_own_task', $task->project) &&
-            $task->assigned_to === $user->id;
+        return $user->hasPermission('update_any_task', $task->project) || (
+            $user->hasPermission('update_task', $task->project)
+            && $task->assigned_to === $user->id
+        );
     }
 
     /**
      * Determine wheather the user can update status the model.
+     * (same rules as update, kept explicit for clarity)
      */
     public function updateStatus(User $user, Task $task): bool
     {
-        if ($user->hasPermission('update_any_task')) return true;   // Global scope permission
-        return $user->hasPermission('update_own_task', $task->project) && $task->assigned_to === $user->id; // Project scope permission
+        return $this->update($user, $task);
     }
 
     /**
@@ -69,7 +65,7 @@ class TaskPolicy
      */
     public function restore(User $user, Task $task): bool
     {
-        return $user->hasRole('owner');
+        return $user->hasPermission('delete_task', $task->project);
     }
 
     /**
@@ -77,6 +73,6 @@ class TaskPolicy
      */
     public function forceDelete(User $user, Task $task): bool
     {
-        return $user->hasRole('owner');
+        return $user->hasPermission('delete_task', $task->project);
     }
 }

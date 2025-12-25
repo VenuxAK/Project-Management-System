@@ -36,7 +36,29 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
+        // Elevated permission (Owner)
+        if ($user->hasPermission('update_any_project')) {
+            return true;
+        }
+
+        // Standard permission + project membership
         return $user->hasPermission('update_project', $project);
+    }
+
+    /**
+     * View project members
+     */
+    public function viewMembers(User $user, Project $project)
+    {
+        return $user->hasPermission('view_project', $project);
+    }
+
+    /**
+     * Can manage the project members
+     */
+    public function manageMembers(User $user, Project $project): bool
+    {
+        return $user->hasPermission('manage_project_members', $project);
     }
 
     /**
@@ -52,7 +74,7 @@ class ProjectPolicy
      */
     public function restore(User $user, Project $project): bool
     {
-        return $user->hasRole('owner');
+        return $user->hasPermission('delete_project', $project);
     }
 
     /**
@@ -60,6 +82,6 @@ class ProjectPolicy
      */
     public function forceDelete(User $user, Project $project): bool
     {
-        return $user->hasRole('owner');
+        return $user->hasPermission('delete_project', $project);
     }
 }

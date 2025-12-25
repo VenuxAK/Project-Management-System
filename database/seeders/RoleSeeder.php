@@ -23,15 +23,17 @@ class RoleSeeder extends Seeder
             'operation_manager' => [
                 'scope' => 'global',
                 'permissions' => [
+                    'view_project',
+                    'view_all_projects',
                     'create_project',
                     'update_project',
-                    'view_all_projects',
-                    'view_project',
+                    'manage_project_members',
+
                     'view_task',
                     'view_all_tasks',
-                    'view_project_tasks',
                     'create_task',
-                    'manage_users',
+                    'assign_task',
+                    'update_task',
                 ],
             ],
 
@@ -39,11 +41,14 @@ class RoleSeeder extends Seeder
                 'scope' => 'project',
                 'permissions' => [
                     'view_project',
+                    'create_project',
                     'update_project',
+
                     'view_task',
                     'view_project_tasks',
                     'create_task',
-                    'update_any_task',
+                    'assign_task',
+                    'update_task',
                     'delete_task',
                 ],
             ],
@@ -53,17 +58,16 @@ class RoleSeeder extends Seeder
                 'permissions' => [
                     'view_project',
                     'view_task',
-                    'update_own_task',
+                    'update_task',
                 ],
             ],
 
             'qa' => [
                 'scope' => 'project',
                 'permissions' => [
-                    'view_task',
-                    'view_project_tasks',
                     'view_project',
-                    'update_own_task',
+                    'view_task',
+                    'update_task',
                 ],
             ],
 
@@ -71,6 +75,7 @@ class RoleSeeder extends Seeder
                 'scope' => 'project',
                 'permissions' => [
                     'view_project',
+                    'view_task',
                 ],
             ],
         ];

@@ -9,23 +9,28 @@ use App\Http\Requests\Tasks\UpdateTaskRequest;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
-use App\Services\Tasks\TaskService;
+use App\Services\Tasks\TaskServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class TaskController extends Controller
 {
-    public function __construct(private TaskService $taskService) {}
+    public function __construct(private TaskServiceInterface $taskService) {}
 
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Task::class);
 
         return Inertia::render('Task/Index', [
-            'tasks' => Task::with('assignee')->visibleTo($request->user())->latest()->get(),
-            'projects' => Project::query()->visibleTo($request->user())->latest()->get(['id', 'name']),
-            'users' => User::query()->employee()->latest()->get()
+            'tasks' => Task::with('assignee')
+                ->visibleTo($request->user())->latest()->get(),
+
+            'projects' => Project::select('id', 'name')
+                ->visibleTo($request->user())->latest()->get(),
+
+            'users' => User::select('id', 'name')
+                ->employee()->latest()->get()
         ]);
     }
 
@@ -51,7 +56,7 @@ class TaskController extends Controller
         return back()->with('success', 'Task Updated Successfully.');
     }
 
-    public function updateStatus(Request $request, Task $task)
+    public function updateStatus(Request $request, Task $task) // Will be update later
     {
         Gate::authorize('updateStatus', $task);
 
@@ -66,7 +71,7 @@ class TaskController extends Controller
 
     public function destroy(DeleteTaskRequest $request, Task $task)
     {
-        $task->delete();
+        $this->taskService->delete($task);
         return redirect()->route('tasks.view')
             ->with('success', 'Task deleted successfully.');
     }
