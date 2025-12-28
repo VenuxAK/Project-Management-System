@@ -7,6 +7,10 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    error: {
+        type: String,
+        required: false,
+    },
 });
 
 const model = defineModel();
@@ -27,6 +31,7 @@ const model = defineModel();
                     'text-gray-800 dark:text-white/90': model,
                 }"
             >
+                <!-- 'border-red-500 dark:border-red-500': error, -->
                 <option value="" disabled selected>Select Option</option>
                 <option v-for="item in items" :key="item" :value="item.value">
                     {{ item.label }}

@@ -7,6 +7,8 @@ use App\Http\Requests\Projects\CreateProjectRequest;
 use App\Http\Requests\Projects\DeleteProjectRequest;
 use App\Http\Requests\Projects\UpdateProjectRequest;
 use App\Models\Project;
+use App\Models\Role;
+use App\Models\User;
 use App\Services\Projects\ProjectServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -21,15 +23,34 @@ class ProjectController extends Controller
     {
         Gate::authorize('viewAny', Project::class);
 
+        // $project =
+
         return Inertia::render('Project/Index', [
             "projects" => Project::query()->visibleTo($request->user())->latest()->get(),
-            // 'project' => Inertia::optional(fn() => Project::where('id', $request->pj_id)->get()) // Load specific project if pj_id is provided
+            'project' => Inertia::optional(
+                fn() =>
+                Project::query()->with([
+                    'members:id, name',
+                    'members.roles:id, name'
+                ])->where('id', $request->pj_id)->first()
+            ), // Load specific project if pj_id is provided to update
+            "users" => User::select('id', 'name')->employee()->get(),
+            "roles" => Role::select('id', 'name')->get()
         ]);
     }
 
     public function store(CreateProjectRequest $request)
     {
-        $this->projectService->create($request->validated(), $request->user());
+        $validated = $request->safe()->only('members');
+        $members = collect($validated['members'] ?? [])
+            ->filter(fn($m) => !empty($m['user_id']) && !empty($m['role_id']))
+            ->values()
+            ->toArray();
+        $this->projectService->create(
+            $request->safe()->only(['name', 'status', 'start_date', 'deadline']),
+            $request->user(),
+            $members // Extract just the IDs
+        );
 
         return redirect()->route('projects.view')->with('success', 'Project created successfully.');
     }

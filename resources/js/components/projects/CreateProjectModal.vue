@@ -9,11 +9,19 @@ import InputError from "@/components/FormElements/InputError.vue";
 import SelectBox from "@/components/FormElements/SelectBox.vue";
 import Button from "@/components/ui/Button.vue";
 import { useProjectManager } from "@/composables/useProjectManager";
-import { onMounted } from "vue";
+import ProjectMemberSection from "./ProjectMemberSection.vue";
 
 const props = defineProps({
     isProjectModalOpen: {
         type: Boolean,
+        required: true,
+    },
+    users: {
+        type: Array,
+        required: true,
+    },
+    roles: {
+        type: Array,
         required: true,
     },
 });
@@ -25,6 +33,7 @@ const formData = useForm({
     status: "",
     start_date: null,
     deadline: null,
+    members: [],
 });
 
 const saveProject = () => {
@@ -40,9 +49,6 @@ const closeProjectModal = () => {
     formData.clearErrors();
     emit("update:isProjectModalOpen", false);
 };
-// onMounted(() => {
-//     console.log("Create Project Mounted");
-// });
 </script>
 
 <template>
@@ -88,6 +94,16 @@ const closeProjectModal = () => {
                                 label="Project Status"
                             />
                             <InputError :message="formData.errors.status" />
+                        </div>
+
+                        <div>
+                            <ProjectMemberSection
+                                v-model="formData.members"
+                                :users="users"
+                                :roles="roles"
+                                :errors="formData.errors"
+                            />
+                            <InputError :message="formData.errors.members" />
                         </div>
 
                         <div>

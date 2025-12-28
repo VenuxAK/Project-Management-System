@@ -17,15 +17,13 @@ class ProjectFactory extends Factory
      */
     public function definition(): array
     {
-        $om = Role::where('name', 'operation_manager')->first('id');
-
         return [
             "name" => $this->faker->sentence(3),
             "status" => $this->faker->randomElement(['planning', 'active', 'completed', 'on-hold']),
             "start_date" => $this->faker->date(),
             "deadline" => $this->faker->date(),
-            "created_by" => $om->id,
-            "updated_by" => $om->id,
+            "created_by" => get_role_id('operation_manager'),
+            "updated_by" => get_role_id('operation_manager'),
         ];
     }
 }

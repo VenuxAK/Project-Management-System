@@ -5,10 +5,12 @@ import InputText from "@/components/FormElements/InputText.vue";
 import InputLabel from "@/components/FormElements/InputLabel.vue";
 import InputError from "@/components/FormElements/InputError.vue";
 import SelectBox from "@/components/FormElements/SelectBox.vue";
+import ProjectMemberSection from "./ProjectMemberSection.vue";
 import Modal from "@/components/ui/Modal.vue";
 import Button from "@/components/ui/Button.vue";
 import CrossIcon from "@/icons/CrossIcon.vue";
 import { useProjectManager } from "@/composables/useProjectManager";
+import { onMounted } from "vue";
 
 const props = defineProps({
     project: {
@@ -28,6 +30,13 @@ const formData = useForm({
     status: props.project.status,
     start_date: props.project.start_date,
     deadline: props.project.deadline,
+    members:
+        props.project.members?.map((member) => {
+            return {
+                user_id: member.id,
+                role_id: member.pivot.role_id,
+            };
+        }) ?? [],
 });
 
 const closeEditProjectModal = () => {
@@ -42,8 +51,9 @@ const onUpdateProject = () => {
         },
     });
 };
+
 // onMounted(() => {
-// console.log(`Project ${props.project.id} found.`);
+//     console.log(props.project.members);
 // });
 </script>
 
@@ -90,6 +100,10 @@ const onUpdateProject = () => {
                                 label="Project Status"
                             />
                             <InputError :message="formData.errors.status" />
+                        </div>
+
+                        <div>
+                            <!-- <ProjectMemberSection  /> -->
                         </div>
 
                         <div>

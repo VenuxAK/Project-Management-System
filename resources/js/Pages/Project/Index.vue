@@ -18,6 +18,18 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    project: {
+        type: Object,
+        required: false,
+    },
+    users: {
+        type: Array,
+        required: true,
+    },
+    roles: {
+        type: Array,
+        required: true,
+    },
 });
 
 const isProjectModalOpen = ref(false);
@@ -39,6 +51,8 @@ const isProjectModalOpen = ref(false);
         </div>
         <CreateProjectModal
             v-if="isProjectModalOpen"
+            :users="users"
+            :roles="roles"
             :isProjectModalOpen="isProjectModalOpen"
             @update:isProjectModalOpen="(e) => (isProjectModalOpen = e)"
         />

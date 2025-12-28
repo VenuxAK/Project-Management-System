@@ -14,6 +14,7 @@
         "jsvectormap": "^1.7.0",
         "pinia": "^3.0.3",
         "vue-flatpickr-component": "^12.0.0",
+        "vue-multiselect": "^3.4.0",
         "vue3-apexcharts": "^1.8.0",
       },
       "devDependencies": {
@@ -444,6 +445,8 @@
     "vue": ["vue@3.5.22", "", { "dependencies": { "@vue/compiler-dom": "3.5.22", "@vue/compiler-sfc": "3.5.22", "@vue/runtime-dom": "3.5.22", "@vue/server-renderer": "3.5.22", "@vue/shared": "3.5.22" }, "peerDependencies": { "typescript": "*" }, "optionalPeers": ["typescript"] }, "sha512-toaZjQ3a/G/mYaLSbV+QsQhIdMo9x5rrqIpYRObsJ6T/J+RyCSFwN2LHNVH9v8uIcljDNa3QzPVdv3Y6b9hAJQ=="],
 
     "vue-flatpickr-component": ["vue-flatpickr-component@12.0.0", "", { "dependencies": { "flatpickr": "^4.6.13" }, "peerDependencies": { "vue": "^3.2.0" } }, "sha512-CJ5jrgTaeD66Z4mjEocSTAdB/n6IGSlUICwdBanpyCI8hswq5rwXvEYQ5IKA3K3uVjP5pBlY9Rg6o3xoszTPpA=="],
+
+    "vue-multiselect": ["vue-multiselect@3.4.0", "", {}, "sha512-NtaL1/VOsGsvM+H0EZswy1E+RcA5yeCpCxrhT28CBwKu9D1WbMSXBfIDNDw0v+T4enVRfOD5X7u2gyIJWCFX9w=="],
 
     "vue3-apexcharts": ["vue3-apexcharts@1.8.0", "", { "peerDependencies": { "apexcharts": ">=4.0.0", "vue": ">=3.0.0" } }, "sha512-5tSD4mXTBbIJ9ir+58qHE6oNtIe0RNgqIRYMKpcsIaxkKtwUww4JhvPkpUFlmiW4OJbbdklgjleXq1lfcM4gdA=="],
 

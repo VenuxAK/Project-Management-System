@@ -8,18 +8,12 @@ use Illuminate\Support\Facades\DB;
 
 class ProjectService implements ProjectServiceInterface
 {
-    /**
-     * Create a new class instance.
-     */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct(private ProjectMemberService $memberService) {}
 
     // Create project-related business logic
-    public function create(array $data, User $actor): Project
+    public function create(array $data, User $actor, array $members = []): Project
     {
-        return DB::transaction(function () use ($data, $actor) {
+        return DB::transaction(function () use ($data, $actor, $members) {
             $project = Project::create([
                 "name" => $data["name"],
                 "status" => $data["status"],
@@ -31,8 +25,13 @@ class ProjectService implements ProjectServiceInterface
 
             // Creator becomes project owner
             $project->members()->attach($actor->id, [
-                'role_id' => 1                      // Fixed: Owner role, will update with helper method later
+                'role_id' => get_role_id('owner')              // Fixed: get owner role from custom helper function \App\Helpers\Helpers.php
             ]);
+
+            // Attach additional members
+            // if (!empty($members)) {
+            app(ProjectMemberService::class)->addMembers($project, $members);
+            // }
 
             return $project;
         });
@@ -49,6 +48,10 @@ class ProjectService implements ProjectServiceInterface
                 "deadline" => $data['deadline'],
                 "updated_by" => $actor->id
             ]);
+
+            if (!empty($data["members"])) {
+                $this->memberService->sync($project, $data["members"]);
+            }
 
             return $project;
         });

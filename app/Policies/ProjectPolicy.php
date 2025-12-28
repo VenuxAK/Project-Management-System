@@ -42,7 +42,7 @@ class ProjectPolicy
         }
 
         // Standard permission + project membership
-        return $user->hasPermission('update_project', $project);
+        return $user->hasPermission('update_project', $project); 
     }
 
     /**

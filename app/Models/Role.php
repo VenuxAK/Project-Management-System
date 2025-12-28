@@ -15,7 +15,6 @@ class Role extends Model
     protected $fillable = ['name', 'scope', 'description'];
 
     protected $hidden = [
-        'id',
         'created_at',
         'updated_at',
     ];

@@ -39,10 +39,10 @@ const onDeleteProject = (project) => {
 
 const isEditProjectModalOpen = ref(false);
 const project = ref({});
-const onEditProject = (pj) => {
-    // console.log(pj.id);
+const onEditProject = async (pj) => {
     isEditProjectModalOpen.value = true;
     project.value = pj;
+    // console.log(pj);
 };
 </script>
 

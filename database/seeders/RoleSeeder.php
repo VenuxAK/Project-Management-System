@@ -43,9 +43,10 @@ class RoleSeeder extends Seeder
                     'view_project',
                     'create_project',
                     'update_project',
+                    'manage_project_members',
 
                     'view_task',
-                    'view_project_tasks',
+                    // 'view_project_tasks',
                     'create_task',
                     'assign_task',
                     'update_task',

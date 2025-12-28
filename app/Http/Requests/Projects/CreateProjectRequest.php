@@ -28,6 +28,18 @@ class CreateProjectRequest extends FormRequest
             "status" => ["required", "in:planning,active,completed,on-hold"],
             "start_date" => ["required", "date"],
             "deadline" => ["required", "date", "after_or_equal:start_date"],
+            "members" => ["required", "array"],
+            "members.*.user_id" => ["required", "exists:users,id"],
+            "members.*.role_id" => ["required", "exists:roles,id"],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            "members.*.user_id.required" => "The user field is required.",
+            "members.*.user_id.exists" => "The selected user is already assigned.",
+            "members.*.role_id.required" => "The role field is required.",
         ];
     }
 }
