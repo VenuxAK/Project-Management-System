@@ -30,7 +30,7 @@ class User extends Authenticatable
         'profile_picture'
     ];
 
-    // protected $with = ['roles'];
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -60,24 +60,6 @@ class User extends Authenticatable
      * Local Scopes
      */
     #[Scope]
-    // public function scopeOwner(Builder $query): Builder
-    // {
-    //     return $query->with('roles')->whereHas('roles', function (Builder $query) {
-    //         $query->where('name', 'like', 'owner');
-    //     });
-    // }
-    // public function scopeOperationManager(Builder $query): Builder
-    // {
-    //     return $query->with('roles')->whereHas('roles', function (Builder $query) {
-    //         $query->where('name', 'like', 'operation_manager');
-    //     });
-    // }
-    // public function scopeProjectLeader(Builder $query): Builder
-    // {
-    //     return $query->with('roles')->whereHas('roles', function (Builder $query) {
-    //         $query->where('name', 'like', 'project_lead');
-    //     });
-    // }
     public function scopeEmployee(Builder $query): Builder
     {
         return $query->with('roles')->whereHas('roles', function (Builder $query) {
@@ -137,6 +119,11 @@ class User extends Authenticatable
     /**
      * Helpers
      */
+    public function isAdministrator(): bool
+    {
+        return $this->hasGlobalPermission('manage_users');
+    }
+
     public function hasRole(string $roleName, ?Project $project = null): bool
     {
         // Global role check

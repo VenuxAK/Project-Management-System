@@ -28,10 +28,7 @@ class ProjectService implements ProjectServiceInterface
                 'role_id' => get_role_id('owner')              // Fixed: get owner role from custom helper function \App\Helpers\Helpers.php
             ]);
 
-            // Attach additional members
-            // if (!empty($members)) {
             app(ProjectMemberService::class)->addMembers($project, $members);
-            // }
 
             return $project;
         });

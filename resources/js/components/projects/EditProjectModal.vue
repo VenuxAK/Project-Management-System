@@ -10,7 +10,6 @@ import Modal from "@/components/ui/Modal.vue";
 import Button from "@/components/ui/Button.vue";
 import CrossIcon from "@/icons/CrossIcon.vue";
 import { useProjectManager } from "@/composables/useProjectManager";
-import { onMounted } from "vue";
 
 const props = defineProps({
     project: {
@@ -52,9 +51,7 @@ const onUpdateProject = () => {
     });
 };
 
-// onMounted(() => {
-//     console.log(props.project.members);
-// });
+
 </script>
 
 <template>

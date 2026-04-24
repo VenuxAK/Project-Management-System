@@ -37,10 +37,6 @@ class Task extends Model
             return $query;
         }
 
-        // return $query->whereHas('project.members', function (Builder $q) use ($user) {
-        //     $q->where('users.id', $user->id);
-        // });
-
         // For project leader
         if ($user->hasPermission('view_task')) {
             return $query->whereHas('project.members', function (Builder $q) use ($user) {

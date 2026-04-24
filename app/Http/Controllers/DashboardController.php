@@ -8,11 +8,11 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         return inertia('IndexView', [
-            "projects" => Project::latest()->get(),
-            "tasks" => Task::latest()->get(),
+            "projects" => Project::query()->visibleTo($request->user())->latest()->get(),
+            "tasks" => Task::query()->visibleTo($request->user())->latest()->get(),
         ]);
     }
 }

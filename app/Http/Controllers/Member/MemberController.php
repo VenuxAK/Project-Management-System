@@ -15,18 +15,19 @@ class MemberController extends Controller
     public function index()
     {
         return Inertia::render('Member/Index', [
-            'members' => User::where('role_id', "!=", 1)->latest()->get(),
+            'members' => User::with('roles:id,name')->latest()->get(),
         ]);
     }
 
     public function store(CreateMemberRequest $request)
     {
-        User::create([
+        $user = User::create([
             "name" => $request->name,
             "email" => $request->email,
-            "role_id" => $request->role_id,
             "password" => Hash::make('password'),
         ]);
+
+        $user->roles()->attach($request->role_id);
 
         return back()->with('success', 'New user created successful');
     }
@@ -36,14 +37,16 @@ class MemberController extends Controller
         $user->update([
             "name" => $request->name,
             "email" => $request->email,
-            "role_id" => $request->role_id,
         ]);
+
+        $user->roles()->sync([$request->role_id]);
 
         return back()->with('success', 'User updated successful.');
     }
 
     public function destroy(DeleteMemberRequest $request, User $user)
     {
+        $user->roles()->detach();
         $user->delete();
 
         return back()->with('success', 'User deleted successful.');

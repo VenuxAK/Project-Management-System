@@ -39,10 +39,6 @@ class TaskService implements TaskServiceInterface
     public function update(Task $task, array $data, User $actor): Task
     {
         return DB::transaction(function () use ($task, $data, $actor) {
-
-            // Implement later ***
-            // $assigneeChanged = array_key_exists('assigned_to', $data) && $data['assigned_to'] !== $task->assigned_to;
-
             $task->update([
                 "name" => $data['name'],
                 "status" => $data['status'],
@@ -61,22 +57,20 @@ class TaskService implements TaskServiceInterface
     public function toggleStatus(Task $task, User $actor): Task
     {
         return DB::transaction(function () use ($task, $actor) {
+            $newStatus = $task->status === "completed" ? "in_progress" : "completed";
+
             $task->update([
-                "status" => $task->status === "completed" ? "in_progress" : "completed",
+                "status" => $newStatus,
                 "updated_by" => $actor->id
             ]);
 
-            if ($task->status === "completed") {
-                // Refresh task instance to get the latest data with relations
-                $task->refresh()->load('creator', 'updater');
+            $task->refresh()->load('creator', 'updater');
 
-                // Send event notification about status update
-                event(new TaskStatusUpdated(
-                    task: $task,
-                    creator: $task->creator,
-                    actor: $actor
-                ));
-            }
+            event(new TaskStatusUpdated(
+                task: $task,
+                creator: $task->creator,
+                actor: $actor
+            ));
 
             return $task;
         });

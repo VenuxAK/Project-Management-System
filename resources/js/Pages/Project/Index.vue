@@ -40,7 +40,7 @@ const isProjectModalOpen = ref(false);
         <PageBreadcrumb pageTitle="Projects" class="mb-4" />
         <div class="my-6">
             <Button
-                v-if="usePage().props.auth.user.role_id != 3"
+                v-if="!usePage().props.auth.user.roles?.some(r => r.id === 3)"
                 size="sm"
                 variant="outline"
                 :endIcon="PlusIcon"

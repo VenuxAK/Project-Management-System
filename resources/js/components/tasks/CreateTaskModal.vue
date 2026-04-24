@@ -9,7 +9,6 @@ import InputError from "@/components/FormElements/InputError.vue";
 import SelectBox from "@/components/FormElements/SelectBox.vue";
 import Button from "@/components/ui/Button.vue";
 import { useTaskManager } from "@/composables/useTaskManager";
-import { onMounted } from "vue";
 
 const { createTask, taskPriorities, taskStatuses } = useTaskManager();
 
@@ -41,15 +40,11 @@ const formData = useForm({
     due_date: "",
 });
 
-const saveProject = () => {
+const saveTask = () => {
     createTask(formData, {
         onSuccess: () => {
-            // console.log("Task Created Successful");
             closeTaskModal();
         },
-        // onError: (errors) => {
-        //     console.log(errors);
-        // },
     });
 };
 
@@ -58,9 +53,7 @@ const closeTaskModal = () => {
     emit("update:isTaskModalOpen", false);
 };
 
-onMounted(() => {
-    console.log("Create Task Modal Mounted!");
-});
+
 </script>
 
 <template>
@@ -82,7 +75,7 @@ onMounted(() => {
                     Assign Task
                 </h4>
             </div>
-            <form @submit.prevent="saveProject" class="flex flex-col">
+            <form @submit.prevent="saveTask" class="flex flex-col">
                 <div class="custom-scrollbar h-[458px] overflow-y-auto p-2">
                     <div class="space-y-6">
                         <div>

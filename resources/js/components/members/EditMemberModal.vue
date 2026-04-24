@@ -8,7 +8,6 @@ import InputError from "@/components/FormElements/InputError.vue";
 import SelectBox from "@/components/FormElements/SelectBox.vue";
 import Button from "@/components/ui/Button.vue";
 import { useMemberManager } from "@/composables/useMemberManager";
-import { onMounted } from "vue";
 
 const props = defineProps({
     isEditMemberModalOpen: {
@@ -63,7 +62,7 @@ const closeEditMemberModal = () => {
                 <h4
                     class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90"
                 >
-                    Create a new member
+                    Edit member
                 </h4>
             </div>
             <form @submit.prevent="onUpdateMember" class="flex flex-col">

@@ -23,7 +23,7 @@ class ProjectController extends Controller
     {
         Gate::authorize('viewAny', Project::class);
 
-        // $project =
+
 
         return Inertia::render('Project/Index', [
             "projects" => Project::query()->visibleTo($request->user())->latest()->get(),

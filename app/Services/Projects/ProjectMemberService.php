@@ -67,23 +67,4 @@ class ProjectMemberService
     }
 
 
-    /**
-     * Replace all members (used for full team redesign).
-     */
-    // public function replaceMembers(Project $project, array $members): void
-    // {
-    //     DB::transaction(function () use ($project, $members) {
-    //         $payload = [];
-
-    //         foreach ($members as $member) {
-    //             $payload[$member['user_id']] = [
-    //                 'role_id' => $member['role_id'],
-    //             ];
-    //         }
-
-    //         // Full replacement
-    //         $project->members()->sync($payload);
-    //     });
-    // }
-
 }

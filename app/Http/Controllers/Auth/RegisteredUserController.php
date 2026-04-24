@@ -30,8 +30,8 @@ class RegisteredUserController extends Controller
             "password" => $request->password,
         ]);
 
-        $devRole = Role::where('name', 'developer')->first('id');
-        $user->roles()->attach($devRole->id);
+        $devRoleId = Role::where('name', 'developer')->value('id');
+        $user->roles()->attach($devRoleId);
 
         Auth::login($user);
 

@@ -8,7 +8,6 @@ import InputError from "@/components/FormElements/InputError.vue";
 import SelectBox from "@/components/FormElements/SelectBox.vue";
 import Button from "@/components/ui/Button.vue";
 import { useMemberManager } from "@/composables/useMemberManager";
-import { onMounted } from "vue";
 
 const props = defineProps({
     isCreateMemberModalOpen: {
@@ -25,7 +24,7 @@ const formData = useForm({
     role_id: "",
 });
 
-const saveProject = () => {
+const saveMember = () => {
     createMember(formData, {
         onSuccess: () => {
             closeCreateMemberModal();
@@ -38,9 +37,7 @@ const closeCreateMemberModal = () => {
     formData.clearErrors();
     emit("update:isCreateMemberModalOpen", false);
 };
-// onMounted(() => {
-//     console.log("Create Project Mounted");
-// });
+
 </script>
 
 <template>
@@ -62,7 +59,7 @@ const closeCreateMemberModal = () => {
                     Create a new member
                 </h4>
             </div>
-            <form @submit.prevent="saveProject" class="flex flex-col">
+            <form @submit.prevent="saveMember" class="flex flex-col">
                 <div class="custom-scrollbar h-[458px] overflow-y-auto p-2">
                     <div class="space-y-6">
                         <div>

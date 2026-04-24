@@ -34,6 +34,7 @@ class Project extends Model
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(User::class, "project_user_roles")
+            ->using(ProjectUserRole::class)
             ->withPivot('role_id')
             ->withTimestamps();
     }
@@ -70,6 +71,10 @@ class Project extends Model
     public function memberRole(User $user): ?Role
     {
         $member = $this->members()->where('users.id', $user->id)->first();
-        return $member?->pivot?->role;
+        if (!$member || !$member->pivot) {
+            return null;
+        }
+        return $member->pivot->role;
     }
+
 }

@@ -1,10 +1,11 @@
 <script setup>
 import DataTable from "@/components/ui/DataTable.vue";
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import Button from "@/components/ui/Button.vue";
 import PlusIcon from "@/icons/PlusIcon.vue";
 import CreateMemberModal from "@/components/members/CreateMemberModal.vue";
 import EditMemberModal from "./EditMemberModal.vue";
+import { useMemberManager } from "@/composables/useMemberManager";
 import { usePage } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -13,6 +14,8 @@ const props = defineProps({
         required: true,
     },
 });
+
+const { deleteMember } = useMemberManager();
 
 const cols = [
     { label: "#ID", key: "id", sortable: false },
@@ -26,8 +29,7 @@ const rows = computed(() => {
             id: member.id,
             name: member.name,
             email: member.email,
-            role: member.role.name,
-            id: member.id,
+            role: member.roles?.[0]?.name ?? "",
         };
     });
 });
@@ -50,10 +52,13 @@ const onEditMember = (member) => {
             id: mb.id,
             name: mb.name,
             email: mb.email,
-            role_id: mb.role_id,
+            role_id: mb.roles?.[0]?.id ?? null,
         };
     })[0];
-    // console.log(selectedMember.value);
+};
+
+const onDeleteUser = (member) => {
+    deleteMember(member.id);
 };
 
 // onMounted(() => {
@@ -78,7 +83,9 @@ const onEditMember = (member) => {
         :rows="rows"
         :initialPageSize="10"
         :editAction="true"
+        :deleteAction="true"
         @edit="onEditMember($event)"
+        @delete="onDeleteUser($event)"
     >
         <template #title>
             <Button
@@ -86,7 +93,7 @@ const onEditMember = (member) => {
                 variant="outline"
                 :endIcon="PlusIcon"
                 @click="onCreateNewUser"
-                v-if="usePage().props.auth.user.role_id === 1"
+                v-if="usePage().props.auth.user.roles?.some(r => r.id === 1)"
             >
                 Create new user
             </Button>
