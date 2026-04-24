@@ -13,7 +13,11 @@ class TaskPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('view_task');
+        return $user->hasGlobalPermission('view_task')
+            || $user->roles()->where('scope', 'project')->whereHas(
+                'permissions',
+                fn($q) => $q->where('name', 'view_task')
+            )->exists();
     }
 
     /**
@@ -29,7 +33,11 @@ class TaskPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermission('create_task');
+        return $user->hasGlobalPermission('create_task')
+            || $user->roles()->where('scope', 'project')->whereHas(
+                'permissions',
+                fn($q) => $q->where('name', 'create_task')
+            )->exists();
     }
 
     /**

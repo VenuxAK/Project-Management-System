@@ -145,7 +145,7 @@ class User extends Authenticatable
     //
     public function hasGlobalPermission(string $permission): bool
     {
-        return $this->roles()->whereHas(
+        return $this->roles()->where('scope', 'global')->whereHas(
             'permissions',
             fn($query) => $query->where('name', $permission)
         )->exists();

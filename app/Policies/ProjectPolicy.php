@@ -12,7 +12,11 @@ class ProjectPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('view_project');
+        return $user->hasGlobalPermission('view_project')
+            || $user->roles()->where('scope', 'project')->whereHas(
+                'permissions',
+                fn($q) => $q->where('name', 'view_project')
+            )->exists();
     }
 
     /**

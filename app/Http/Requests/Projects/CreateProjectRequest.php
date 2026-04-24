@@ -28,7 +28,7 @@ class CreateProjectRequest extends FormRequest
             "status" => ["required", "in:planning,active,completed,on-hold"],
             "start_date" => ["required", "date"],
             "deadline" => ["required", "date", "after_or_equal:start_date"],
-            "members" => ["required", "array"],
+            "members" => ["nullable", "array"],
             "members.*.user_id" => ["required", "exists:users,id"],
             "members.*.role_id" => ["required", "exists:roles,id"],
         ];
