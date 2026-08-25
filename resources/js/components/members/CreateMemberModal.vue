@@ -103,8 +103,13 @@ const closeCreateMemberModal = () => {
                     >
                         Close
                     </Button>
-                    <Button type="submit" variant="primary" size="sm">
-                        Save User
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        size="sm"
+                        :disabled="formData.processing"
+                    >
+                        {{ formData.processing ? "Saving..." : "Save User" }}
                     </Button>
                 </div>
             </form>

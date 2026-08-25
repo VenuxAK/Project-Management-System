@@ -2,19 +2,18 @@
 
 namespace App\Http\Requests\Projects;
 
-use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
-class CreateMemberRequest extends FormRequest
+class UpdateProjectMemberRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return Auth::user()->isAdministrator() ? true : false;
+        return Gate::allows('manageMembers', $this->route('project'));
     }
 
     /**
@@ -25,12 +24,7 @@ class CreateMemberRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => ["required", "string", "min:3", "max:50"],
-            "email" => ["required", "string", "email", "lowercase", "unique:" . User::class],
-            "role_id" => [
-                "required",
-                Rule::exists('roles', 'id')->where('scope', 'global'),
-            ],
+            "role_id" => ["required", Rule::exists('roles', 'id')],
         ];
     }
 }

@@ -170,6 +170,9 @@ function prevPage() {
                             <button
                                 class="absolute text-gray-500 -translate-y-1/2 left-4 top-1/2 dark:text-gray-400"
                                 v-if="showSearch"
+                                type="button"
+                                aria-hidden="true"
+                                tabindex="-1"
                                 @click.prevent
                             >
                                 <svg
@@ -200,6 +203,13 @@ function prevPage() {
                                     <th
                                         v-for="col in columns"
                                         :key="col.key"
+                                        :aria-sort="
+                                            sortKey === col.key
+                                                ? sortDir === 'asc'
+                                                    ? 'ascending'
+                                                    : 'descending'
+                                                : undefined
+                                        "
                                         class="px-4 py-3 border border-gray-100 dark:border-white/[0.05] text-left"
                                     >
                                         <div
@@ -255,7 +265,7 @@ function prevPage() {
                             <tbody>
                                 <tr
                                     v-for="(row, rowIndex) in paginatedRows"
-                                    :key="rowIndex"
+                                    :key="row.id ?? rowIndex"
                                     class="border-t border-gray-100 dark:border-white/[0.5]"
                                 >
                                     <td
@@ -290,6 +300,7 @@ function prevPage() {
                                                 <!-- default actions -->
                                                 <button
                                                     v-if="deleteAction"
+                                                    aria-label="Delete"
                                                     @click="
                                                         $emit('delete', row)
                                                     "
@@ -299,6 +310,7 @@ function prevPage() {
                                                 </button>
                                                 <button
                                                     v-if="editAction"
+                                                    aria-label="Edit"
                                                     @click="$emit('edit', row)"
                                                     class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90"
                                                 >
@@ -307,6 +319,12 @@ function prevPage() {
 
                                                 <button
                                                     v-if="updateStatusAction"
+                                                    :aria-label="
+                                                        row.status ===
+                                                        'completed'
+                                                            ? 'Mark as in progress'
+                                                            : 'Mark as completed'
+                                                    "
                                                     @click="
                                                         $emit(
                                                             'updateStatus',

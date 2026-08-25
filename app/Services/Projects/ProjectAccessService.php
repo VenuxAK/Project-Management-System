@@ -99,4 +99,24 @@ class ProjectAccessService
          */
         return $role->hasPermission($permission);
     }
+
+    /**
+     * Determine if a user holds a permission either globally or through
+     * any project-scoped role, without requiring a specific project.
+     *
+     * Used for index screens ("viewAny", "create") where no single project
+     * context exists yet — actual per-project access is still enforced
+     * later via can().
+     */
+    public function canAcrossAnyProject(User $user, string $permission): bool
+    {
+        return $user->hasGlobalPermission($permission)
+            || $user->roles()
+                ->where('scope', 'project')
+                ->whereHas(
+                    'permissions',
+                    fn($query) => $query->where('name', $permission)
+                )
+                ->exists();
+    }
 }

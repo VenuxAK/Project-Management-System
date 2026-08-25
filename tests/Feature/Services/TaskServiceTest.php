@@ -53,6 +53,23 @@ class TaskServiceTest extends TestCase
     }
 
     /** @test */
+    public function create_task_defaults_status_to_pending()
+    {
+        $project = $this->createProjectWithOwner($this->pl);
+
+        $task = $this->taskService->create([
+            'name' => 'Default Status Task',
+            'priority' => 'medium',
+            'start_date' => '2026-01-01',
+            'due_date' => '2026-06-01',
+            'project_id' => $project->id,
+            'assigned_to' => $this->dev->id,
+        ], $this->pl);
+
+        $this->assertEquals('pending', $task->status);
+    }
+
+    /** @test */
     public function update_task_modifies_fields()
     {
         $project = $this->createProjectWithOwner($this->pl);

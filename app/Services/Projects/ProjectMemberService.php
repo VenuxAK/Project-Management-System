@@ -16,10 +16,9 @@ class ProjectMemberService
     {
         return DB::transaction(function () use ($project, $members) {
             $payload = [];
-            // dd($members);
+
             foreach ($members as $member) {
                 $payload[$member['user_id']] = [
-                    // 'role_id' => get_role_id("developer"),
                     'role_id' => $member['role_id'],
                 ];
             }

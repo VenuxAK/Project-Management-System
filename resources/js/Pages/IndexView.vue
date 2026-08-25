@@ -19,7 +19,6 @@ import AdminLayout from "@/components/layout/AdminLayout.vue";
 import SidebarProvider from "@/components/layout/SidebarProvider.vue";
 import DashboardHeader from "@/components/dashboard/DashboardHeader.vue";
 import ProjectDataTable from "@/components/dashboard/ProjectDataTable.vue";
-// import TaskTable from "@/components/tasks/TaskTable.vue";
 
 defineOptions({
     layout: SidebarProvider,
@@ -27,10 +26,6 @@ defineOptions({
 
 const props = defineProps({
     projects: {
-        type: Array,
-        required: true,
-    },
-    tasks: {
         type: Array,
         required: true,
     },

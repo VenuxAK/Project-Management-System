@@ -16,6 +16,8 @@ const isFormInstance = (f) =>
  * defaultFields: object used when creating a disposable form
  */
 export const useResourceManager = (baseUrl, defaultFields = {}) => {
+    let removeInFlight = false;
+
     const makeForm = (data = {}) => {
         return useForm(Object.assign({}, defaultFields, data));
     };
@@ -63,21 +65,24 @@ export const useResourceManager = (baseUrl, defaultFields = {}) => {
     };
 
     const remove = (id, options = {}) => {
-        if (!id) return;
-        if (options.confirm !== false) {
-            if (
-                !confirm(
-                    options.confirmMessage || "Are you sure you want to delete?"
-                )
-            ) {
-                if (options.onCancel) options.onCancel();
-                return;
-            }
+        if (!id || removeInFlight) return;
+        if (
+            options.confirm !== false &&
+            !confirm(
+                options.confirmMessage || "Are you sure you want to delete?"
+            )
+        ) {
+            if (options.onCancel) options.onCancel();
+            return;
         }
+        removeInFlight = true;
         const form = useForm();
         return form.delete(`${baseUrl}/${id}`, {
             onSuccess: options.onSuccess,
             onError: options.onError,
+            onFinish: () => {
+                removeInFlight = false;
+            },
         });
     };
 

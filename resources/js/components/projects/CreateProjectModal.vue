@@ -131,8 +131,15 @@ const closeProjectModal = () => {
                     >
                         Close
                     </Button>
-                    <Button type="submit" variant="primary" size="sm">
-                        Save Project
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        size="sm"
+                        :disabled="formData.processing"
+                    >
+                        {{
+                            formData.processing ? "Saving..." : "Save Project"
+                        }}
                     </Button>
                 </div>
             </form>

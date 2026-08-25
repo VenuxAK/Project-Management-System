@@ -7,11 +7,13 @@ import Button from "@/components/ui/Button.vue";
 import PlusIcon from "@/icons/PlusIcon.vue";
 import CreateTaskModal from "@/components/tasks/CreateTaskModal.vue";
 import TaskDataTable from "@/components/tasks/TaskDataTable.vue";
-import { usePage } from "@inertiajs/vue3";
+import { useAuth } from "@/composables/useAuth";
 
 defineOptions({
     layout: SidebarProvider,
 });
+
+const { can } = useAuth();
 
 const props = defineProps({
     tasks: {
@@ -52,7 +54,7 @@ const computedUsers = computed(() => {
 
         <div class="my-6">
             <Button
-                v-if="!usePage().props.auth.user.roles?.some(r => r.id === 3)"
+                v-if="can('create_task')"
                 size="sm"
                 variant="outline"
                 :endIcon="PlusIcon"

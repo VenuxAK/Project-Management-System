@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Member\MemberController;
 use App\Http\Controllers\Project\ProjectController;
+use App\Http\Controllers\Project\ProjectMemberController;
 use App\Http\Controllers\Task\TaskController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/projects', [ProjectController::class, "store"])->name('projects.post');
     Route::put('/projects/{project}', [ProjectController::class, "update"])->name('projects.update');
     Route::delete('/projects/{project}', [ProjectController::class, "destroy"])->name('projects.delete');
+
+    Route::post('/projects/{project}/members', [ProjectMemberController::class, "store"])->name('projects.members.store');
+    Route::patch('/projects/{project}/members/{user}', [ProjectMemberController::class, "update"])->name('projects.members.update');
+    Route::delete('/projects/{project}/members/{user}', [ProjectMemberController::class, "destroy"])->name('projects.members.destroy');
 
     Route::get('/tasks', [TaskController::class, "index"])->name('tasks.view');
     Route::post('/tasks', [TaskController::class, "store"])->name('tasks.post');

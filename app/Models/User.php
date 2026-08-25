@@ -142,6 +142,12 @@ class User extends Authenticatable
             ->can($this, $permission, $project);
     }
 
+    public function hasPermissionAcrossProjects(string $permission): bool
+    {
+        return app(ProjectAccessService::class)
+            ->canAcrossAnyProject($this, $permission);
+    }
+
     //
     public function hasGlobalPermission(string $permission): bool
     {

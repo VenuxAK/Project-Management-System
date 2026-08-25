@@ -16,7 +16,7 @@ class TaskService implements TaskServiceInterface
             $task = Task::create([
                 "name" => $data['name'],
                 "priority" => $data['priority'],
-                "status" => $data['status'],
+                "status" => $data['status'] ?? 'pending',
                 "start_date" => $data['start_date'],
                 "due_date" => $data['due_date'],
                 "project_id" => $data['project_id'],

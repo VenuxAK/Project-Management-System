@@ -153,8 +153,13 @@ const closeTaskModal = () => {
                     >
                         Close
                     </Button>
-                    <Button type="submit" variant="primary" size="sm">
-                        Assign
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        size="sm"
+                        :disabled="formData.processing"
+                    >
+                        {{ formData.processing ? "Assigning..." : "Assign" }}
                     </Button>
                 </div>
             </form>

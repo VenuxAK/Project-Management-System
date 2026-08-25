@@ -23,10 +23,18 @@ class ProjectController extends Controller
     {
         Gate::authorize('viewAny', Project::class);
 
+        $projects = Project::query()
+            ->visibleTo($request->user())
+            ->with('members:id,name')
+            ->latest()
+            ->get();
 
+        $projects->each(function (Project $project) use ($request) {
+            $project->can_manage_members = $request->user()->can('manageMembers', $project);
+        });
 
         return Inertia::render('Project/Index', [
-            "projects" => Project::query()->visibleTo($request->user())->latest()->get(),
+            "projects" => $projects,
             'project' => Inertia::optional(
                 fn() =>
                 Project::query()->with([

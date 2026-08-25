@@ -109,8 +109,15 @@ const closeEditMemberModal = () => {
                     >
                         Close
                     </Button>
-                    <Button type="submit" variant="primary" size="sm">
-                        Save Changes
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        size="sm"
+                        :disabled="formData.processing"
+                    >
+                        {{
+                            formData.processing ? "Saving..." : "Save Changes"
+                        }}
                     </Button>
                 </div>
             </form>

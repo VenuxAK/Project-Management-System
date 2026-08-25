@@ -18,11 +18,6 @@ export default defineConfig({
             "@": path.resolve(__dirname, "resources/js"),
             "@components": path.resolve(__dirname, "resources/js/components"),
             "@pages": path.resolve(__dirname, "resources/js/Pages"),
-            "@layouts": path.resolve(__dirname, "resources/js/Layouts"),
         },
     },
-    // resolve: (name) => {
-    //     const pages = import.meta.glob("./Pages/**/*.vue", { eager: true });
-    //     return pages[`./Pages/${name}.vue`];
-    // },
 });

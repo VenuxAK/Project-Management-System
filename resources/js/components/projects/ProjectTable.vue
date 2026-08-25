@@ -2,12 +2,24 @@
 import DataTable from "@/components/ui/DataTable.vue";
 import { useProjectManager } from "@/composables/useProjectManager";
 import EditProjectModal from "@/components/projects/EditProjectModal.vue";
+import ManageProjectMembersModal from "@/components/projects/ManageProjectMembersModal.vue";
 import { computed, ref } from "vue";
+import PenIcon from "@/icons/PenIcon.vue";
+import TrashIcon from "@/icons/TrashIcon.vue";
+import UserGroupIcon from "@/icons/UserGroupIcon.vue";
 
 const { deleteProject } = useProjectManager();
 
 const props = defineProps({
     projects: {
+        type: Array,
+        required: true,
+    },
+    users: {
+        type: Array,
+        required: true,
+    },
+    roles: {
         type: Array,
         required: true,
     },
@@ -29,6 +41,7 @@ const rows = computed(() => {
             status: project.status,
             start_date: project.start_date,
             deadline: project.deadline,
+            can_manage_members: project.can_manage_members ?? false,
         };
     });
 });
@@ -38,12 +51,20 @@ const onDeleteProject = (project) => {
 };
 
 const isEditProjectModalOpen = ref(false);
-const project = ref({});
-const onEditProject = async (pj) => {
+const selectedProject = ref({});
+const onEditProject = (pj) => {
+    selectedProject.value = findOriginal(pj.id);
     isEditProjectModalOpen.value = true;
-    project.value = pj;
-    // console.log(pj);
 };
+
+const isMembersModalOpen = ref(false);
+const onManageMembers = (pj) => {
+    selectedProject.value = findOriginal(pj.id);
+    isMembersModalOpen.value = true;
+};
+
+const findOriginal = (id) =>
+    props.projects.find((project) => project.id === id) ?? {};
 </script>
 
 <template>
@@ -51,7 +72,15 @@ const onEditProject = async (pj) => {
         v-if="isEditProjectModalOpen"
         :isEditProjectModalOpen="isEditProjectModalOpen"
         @update:isEditProjectModalOpen="(e) => (isEditProjectModalOpen = e)"
-        :project="project"
+        :project="selectedProject"
+    />
+    <ManageProjectMembersModal
+        v-if="isMembersModalOpen"
+        :isModalOpen="isMembersModalOpen"
+        @update:isModalOpen="(e) => (isMembersModalOpen = e)"
+        :project="selectedProject"
+        :users="users"
+        :roles="roles"
     />
     <DataTable
         :columns="cols"
@@ -60,8 +89,34 @@ const onEditProject = async (pj) => {
         :editAction="true"
         :deleteAction="true"
         @delete="onDeleteProject($event)"
-        @edit="onEditProject($event)"
     >
+        <template #actions="{ row }">
+            <button
+                v-if="row.can_manage_members"
+                aria-label="Manage members"
+                title="Manage members"
+                class="text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-white/90"
+                @click="onManageMembers(row)"
+            >
+                <UserGroupIcon />
+            </button>
+            <button
+                aria-label="Edit project"
+                title="Edit project"
+                class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90"
+                @click="onEditProject(row)"
+            >
+                <PenIcon />
+            </button>
+            <button
+                aria-label="Delete project"
+                title="Delete project"
+                class="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500"
+                @click="onDeleteProject(row)"
+            >
+                <TrashIcon />
+            </button>
+        </template>
         <template #cell-status="{ row }">
             <div class="font-medium">
                 <span

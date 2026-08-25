@@ -6,7 +6,7 @@ import PlusIcon from "@/icons/PlusIcon.vue";
 import CreateMemberModal from "@/components/members/CreateMemberModal.vue";
 import EditMemberModal from "./EditMemberModal.vue";
 import { useMemberManager } from "@/composables/useMemberManager";
-import { usePage } from "@inertiajs/vue3";
+import { useAuth } from "@/composables/useAuth";
 
 const props = defineProps({
     members: {
@@ -16,6 +16,7 @@ const props = defineProps({
 });
 
 const { deleteMember } = useMemberManager();
+const { can } = useAuth();
 
 const cols = [
     { label: "#ID", key: "id", sortable: false },
@@ -93,7 +94,7 @@ const onDeleteUser = (member) => {
                 variant="outline"
                 :endIcon="PlusIcon"
                 @click="onCreateNewUser"
-                v-if="usePage().props.auth.user.roles?.some(r => r.id === 1)"
+                v-if="can('manage_users')"
             >
                 Create new user
             </Button>

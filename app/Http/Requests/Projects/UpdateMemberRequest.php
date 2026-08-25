@@ -5,6 +5,7 @@ namespace App\Http\Requests\Projects;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class UpdateMemberRequest extends FormRequest
 {
@@ -25,8 +26,17 @@ class UpdateMemberRequest extends FormRequest
     {
         return [
             "name" => ["required", "string", "min:3", "max:50"],
-            "email" => ["required", "string", "email", "lowercase", "exists:" . User::class],
-            "role_id" => ["required", "in:2,3"]
+            "email" => [
+                "required",
+                "string",
+                "email",
+                "lowercase",
+                Rule::unique(User::class)->ignore($this->route('user')),
+            ],
+            "role_id" => [
+                "required",
+                Rule::exists('roles', 'id')->where('scope', 'global'),
+            ],
         ];
     }
 }

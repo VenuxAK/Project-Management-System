@@ -3,30 +3,35 @@
 namespace App\Http\Controllers\Project;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Projects\AttachProjectMembersRequest;
+use App\Http\Requests\Projects\RemoveProjectMemberRequest;
+use App\Http\Requests\Projects\UpdateProjectMemberRequest;
+use App\Models\Project;
+use App\Models\User;
+use App\Services\Projects\ProjectMemberService;
 
 class ProjectMemberController extends Controller
 {
-    //
-}
+    public function __construct(private ProjectMemberService $memberService) {}
 
-/**
- *
-
-    public function store(Request $request, Project $project)
+    public function store(AttachProjectMembersRequest $request, Project $project)
     {
-        $this->authorize('manageMembers', $project);
-
-        $validated = $request->validate([
-            'members' => 'required|array|min:1',
-            'members.*.user_id' => 'required|exists:users,id',
-            'members.*.role_id' => 'required|exists:roles,id',
-        ]);
-
-        $this->memberService->syncMembers($project, $validated['members']);
+        $this->memberService->addMembers($project, $request->validated('members'));
 
         return back()->with('success', 'Project members added.');
     }
 
- *
- */
+    public function update(UpdateProjectMemberRequest $request, Project $project, User $user)
+    {
+        $this->memberService->updateMemberRole($project, $user, $request->validated('role_id'));
+
+        return back()->with('success', 'Member role updated.');
+    }
+
+    public function destroy(RemoveProjectMemberRequest $request, Project $project, User $user)
+    {
+        $this->memberService->removeMember($project, $user);
+
+        return back()->with('success', 'Member removed from the project.');
+    }
+}

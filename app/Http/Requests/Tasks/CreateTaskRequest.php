@@ -26,7 +26,7 @@ class CreateTaskRequest extends FormRequest
         return [
             "name" => ["required", "string", "max:255"],
             "priority" => ["required", "in:low,medium,high"],
-            "status" => ["required", "in:pending,in_progress,completed"],
+            "status" => ["sometimes", "in:pending,in_progress,completed"],
             "start_date" => ["required", "date"],
             "due_date" => ["required", "date", "after_or_equal:start_date"],
             "project_id" => ["required", "exists:projects,id"],

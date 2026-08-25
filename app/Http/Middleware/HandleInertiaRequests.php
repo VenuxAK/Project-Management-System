@@ -37,9 +37,13 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            'auth.user' => fn() => $request->user()
-                ? $request->user()->only('id', 'name', 'email', 'profile_picture', 'role_id')
-                : null,
+            'auth' => [
+                'user' => fn() => $request->user()
+                    ? $request->user()->only('id', 'name', 'email', 'profile_picture')
+                    : null,
+                'roles' => fn() => $this->sharedRoles($request),
+                'permissions' => fn() => $this->sharedPermissions($request),
+            ],
             'flash' => [
                 'success' => fn() => $request->session()->get('success'),
                 'error' => fn() => $request->session()->get('error'),
@@ -47,5 +51,42 @@ class HandleInertiaRequests extends Middleware
                 'info' => fn() => $request->session()->get('info'),
             ],
         ];
+    }
+
+    /**
+     * Global roles of the authenticated user, shared for UI display purposes.
+     */
+    private function sharedRoles(Request $request): array
+    {
+        if (! $user = $request->user()) {
+            return [];
+        }
+
+        return $user->loadMissing('roles')->roles
+            ->where('scope', 'global')
+            ->map(fn($role) => $role->only('id', 'name', 'scope'))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Permission names granted by the user's global roles.
+     *
+     * Project-scoped permissions are intentionally excluded: they are only
+     * meaningful within a project context and must be resolved server-side.
+     */
+    private function sharedPermissions(Request $request): array
+    {
+        if (! $user = $request->user()) {
+            return [];
+        }
+
+        return $user->loadMissing('roles.permissions')->roles
+            ->where('scope', 'global')
+            ->flatMap(fn($role) => $role->permissions)
+            ->unique('id')
+            ->pluck('name')
+            ->values()
+            ->all();
     }
 }
